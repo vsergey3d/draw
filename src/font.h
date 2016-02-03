@@ -18,7 +18,7 @@ public:
 	FontImpl(const FontImpl&) = delete;
 	FontImpl& operator = (const FontImpl&) = delete;
 
-	bool init(Error::Code& errorCode, std::string& errorDesc);
+	bool init(Error::Code& errorCode);
 
 	ImagePtr atlas() const { return atlas_; }
 	const Letters& letters() const { return letters_; }

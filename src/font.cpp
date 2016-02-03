@@ -1,235 +1,222 @@
 #include "font.h"
-#include <agg.h>
 #include <error.h>
-#include <map>
 #include <algorithm>
+#if defined(_MSC_VER)
+#pragma warning(disable: 4244 4512 4100 4996 4267)
+#endif
+#include <agg_pixfmt_gray.h>
+#include <agg_renderer_scanline.h>
+#include <agg_font_cache_manager.h>
+#include <agg_font_freetype.h>
+#if defined(_MSC_VER)
+#pragma warning(default: 4244 4512 4100 4996 4267)
+#endif
 
 namespace draw {
+
+using Glyph = agg::glyph_cache;
+
+struct FontContext {
+
+	using FontEngine = agg::font_engine_freetype_int32;
+	using FontManager = agg::font_cache_manager<FontEngine>;
+
+	FontEngine engine;
+	FontManager manager;
+
+	FontContext() : manager(engine) {}
+};
+
+template <typename Callable>
+bool forEachGlyph(FontContext& context, const std::wstring& text, Callable&& callable,
+	Error::Code& errorCode) {
+
+	const wchar_t* c = text.c_str();
+	while (*c) {
+		context.manager.reset_last_glyph();
+
+		const Glyph* glyph = context.manager.glyph((uint32_t)*c);
+		if (!glyph) {
+			errorCode = Code::UnsupportedFontGlyph;
+			return false;
+		}
+		if (!(glyph->bounds.x1 == 0 && glyph->bounds.x2 == 0 &&
+			  glyph->bounds.y1 == 0 && glyph->bounds.y2 == 0)) {
+
+			callable(*c, *glyph);
+		}
+		++c;
+	}
+	return true;
+}
+
+class Renderer {
+
+public:
+	Renderer(uint32_t width, uint32_t height) :
+		width_(width), height_(height) {
+
+		auto size = width_ * height_;
+		if (buffer_.size() < size) {
+			buffer_.resize(size);
+		}
+		impl_ = make_unique<Impl>(buffer_.data(), width_, height_);
+	}
+	~Renderer() = default;
+
+	Renderer(Renderer&) = delete;
+	Renderer& operator = (const Renderer&) = delete;
+
+	void renderGlyph(FontContext& context, const Glyph& glyph, double x, double y) {
+
+		context.manager.init_embedded_adaptors(&glyph, x, y);
+		agg::render_scanlines(context.manager.gray8_adaptor(),
+			context.manager.gray8_scanline(), impl_->glyphRenderer);
+	}
+
+	ImagePtr makeAtlas() {
+
+		auto atlas = makeImage(width_, height_, Image::Format::A, true);
+		atlas->upload(buffer_.data(), buffer_.size());
+		return atlas;
+	}
+
+private:
+	struct Impl {
+
+		using AggPixelFormat = agg::pixfmt_gray8;
+		using AggRenderer = agg::renderer_base<AggPixelFormat>;
+		using AggGlyphRenderer = agg::renderer_scanline_aa_solid<AggRenderer>;
+
+		agg::rendering_buffer buffer;
+		AggPixelFormat pixelFormat;
+		AggRenderer renderer;
+		AggGlyphRenderer glyphRenderer;
+
+		Impl(uint8_t* tmpBuffer, uint32_t width, uint32_t height) :
+			buffer(tmpBuffer, width, height, width),
+			pixelFormat(buffer),
+			renderer(pixelFormat),
+			glyphRenderer(renderer) {
+
+			renderer.clear(0);
+			glyphRenderer.color(255);
+		}
+	};
+
+	uint32_t width_ {0};
+	uint32_t height_ {0};
+	std::unique_ptr<Impl> impl_;
+	static std::vector<uint8_t> buffer_;
+};
+
+std::vector<uint8_t> Renderer::buffer_{};
 
 class Generator {
 
 public:
-	Generator();
+	Generator() {
+
+		static const auto kMinCharCode = 32u;
+		static const auto kMaxCharCode = 126u;
+
+		alphabet_.reserve(kMaxCharCode - kMinCharCode);
+		for (wchar_t c = kMinCharCode; c <= kMaxCharCode; ++c) {
+			alphabet_.push_back(c);
+		}
+	}
 	~Generator() = default;
 
 	Generator(Generator&) = delete;
 	Generator& operator = (const Generator&) = delete;
 
 	ImagePtr atlas(const std::string& filePath, uint32_t letterSize,
-		Letters& letters, Error::Code& errorCode, std::string& errorDesc);
+		Letters& letters, Error::Code& errorCode) {
+
+		static const auto kBorderWidth = 1u, kBorderSize = kBorderWidth * 2;
+		static const auto kSpaceFactor = 0.7f;
+
+		errorCode = Code::NoError;
+		letters.clear();
+
+		auto context = getContext(filePath, letterSize, errorCode);
+		if (!context)
+			return ImagePtr();
+
+		auto width = 0, height = 0, heightOffset = 0;
+		auto x = (double)kBorderWidth, y = 0.0;
+
+		if (!forEachGlyph(*context, alphabet_,
+			[&x, &height, &heightOffset](wchar_t c, const Glyph& glyph){
+				if (c != kSpaceSymbol) {
+					height = std::max<int32_t>(height, glyph.bounds.y2 - glyph.bounds.y1);
+					heightOffset = std::min(heightOffset, glyph.bounds.y1);
+				}
+				x += (c == kSpaceSymbol ? kSpaceFactor : 1.0f) * glyph.advance_x + kBorderSize;
+			}, errorCode)) {
+			return ImagePtr();
+		}
+		width = (int32_t)ceil(x);
+		height += -heightOffset + kBorderSize;
+
+		Renderer renderer((uint32_t)width, (uint32_t)height);
+		x = kBorderWidth;
+		y = -heightOffset + kBorderWidth;
+
+		if (!forEachGlyph(*context, alphabet_,
+			[&renderer, &context, &letters, &x, &y, &height](wchar_t c, const Glyph& glyph){
+				if (c != kSpaceSymbol) {
+					renderer.renderGlyph(*context, glyph, x, y);
+				}
+				auto w = std::max(glyph.advance_x, (double)(glyph.bounds.x2 - glyph.bounds.x1));
+				if (c == kSpaceSymbol) w *= kSpaceFactor;
+				letters[c] = Rect((uint32_t)x, 0, (uint32_t)(x + w), height);
+				x += w + kBorderSize;
+			}, errorCode)) {
+			return ImagePtr();
+		}
+		return renderer.makeAtlas();
+	}
 
 private:
-	static const uint32_t kMinCharCode = 32;
-	static const uint32_t kMaxCharCode = 126;
-	static const uint32_t kCharCount = kMaxCharCode - kMinCharCode;
-	static const uint32_t kBPP = 1;
-	static const uint32_t kBorderWidth = 1;
-	static const uint32_t kBorderSize = kBorderWidth * 2;
-	static const float kSpaceFactor;
+	FontContext* getContext(const std::string& filePath, uint32_t letterSize,
+		Error::Code& errorCode) {
 
-	struct Key {
+		auto& ctxt = cache_[filePath];
+		if (!ctxt) {
+			ctxt = make_unique<FontContext>();
+			ASSERT(ctxt->engine.last_error() == 0);
 
-		std::string filePath;
-		uint32_t letterSize;
+			if (!ctxt->engine.load_font(filePath.c_str(), 0, agg::glyph_ren_native_gray8)) {
+				errorCode = Code::InvalidFontFile;
+				return nullptr;
+			}
+		}
+		ctxt->engine.hinting(false);
 
-		Key(const std::string& filePath, uint32_t letterSize) :
-			filePath(filePath), letterSize(letterSize) {}
+		if (ctxt->engine.height() != letterSize ||
+			ctxt->engine.width() != letterSize) {
+			ctxt->engine.height(letterSize);
+			ctxt->engine.width(letterSize);
+		}
+		return ctxt.get();
+	}
 
-		bool operator < (const Key& other) const;
-	};
-
-	aggdef::FontContext* initFont(const Key& key,
-		Error::Code& errorCode, std::string& errorDesc);
-
-	void renderFont(aggdef::FontContext& fontCntx, void* buff, uint32_t width,
-		uint32_t height, uint32_t stride, int32_t heightOffset, Letters& letters);
-
-	void calcAtlasParams(const std::wstring &text, aggdef::FontContext &fontCntx,
-		uint32_t &width, uint32_t &height, int32_t &heightOffset);
-
-	std::unordered_map<std::string, aggdef::FontContextPtr> fontCache_;
-	std::vector<unsigned char> buff_;
+	std::unordered_map<std::string, std::unique_ptr<FontContext>> cache_;
 	std::wstring alphabet_;
 };
 
-const float Generator::kSpaceFactor = 0.7f;
-
-bool Generator::Key::operator < (const Key& other) const {
-
-	if (std::lexicographical_compare(filePath.begin(), filePath.end(),
-		other.filePath.begin(), other.filePath.end())) {
-		return true;
-	}
-	else if (std::lexicographical_compare(other.filePath.begin(),
-		other.filePath.end(), filePath.begin(), filePath.end())) {
-		return false;
-	}
-	if (letterSize < other.letterSize) {
-		return true;
-	}
-	else if (other.letterSize < letterSize) {
-		return false;
-	}
-	return false;
-}
-
-Generator::Generator() {
-
-	alphabet_.reserve(kCharCount);
-	for (wchar_t wchar = kMinCharCode; wchar <= kMaxCharCode; ++wchar) {
-		alphabet_.push_back(wchar);
-	}
-}
-
-ImagePtr Generator::atlas(const std::string& filePath, uint32_t letterSize,
-	Letters& letters, Error::Code& errorCode, std::string& errorDesc) {
-
-	errorCode = Code::NoError;
-	errorDesc.clear();
-
-	auto context = initFont(Key(filePath, letterSize), errorCode, errorDesc);
-	if (context == nullptr)
-		return false;
-
-	auto width = 0u, height = 0u;
-	auto heightOffset = 0;
-	calcAtlasParams(alphabet_, *context, width, height, heightOffset);
-
-	auto stride = width * kBPP;
-	auto size = stride * height;
-
-	if (buff_.empty() || buff_.size() < size) {
-		buff_.reserve(size);
-		buff_.resize(size);
-	}
-	renderFont(*context, &buff_[0], width, height, stride, heightOffset, letters);
-
-	auto atlas = makeImage(width, height, Image::Format::A, true);
-	atlas->upload(&buff_[0], size);
-	return atlas;
-}
-
-aggdef::FontContext* Generator::initFont(const Key& key,
-	Error::Code& errorCode, std::string& errorDesc) {
-
-	const auto& path = key.filePath;
-
-	auto it = fontCache_.find(path);
-	if (it == fontCache_.end()) {
-		auto context = std::unique_ptr<aggdef::FontContext>(new aggdef::FontContext());
-		ASSERT(context->engine.last_error() == 0);
-
-		if (!context->engine.load_font(path.c_str(), 0, agg::glyph_ren_native_gray8)) {
-			errorCode = Code::InvalidFontFile;
-			errorDesc = aggdef::freeTypeError(context->engine.last_error());
-			return nullptr;
-		}
-		it = fontCache_.emplace(path, std::move(context)).first;
-	}
-	auto context = it->second.get();
-	context->engine.hinting(false);
-
-	if (context->engine.height() != key.letterSize ||
-		context->engine.width() != key.letterSize) {
-
-		context->engine.height(key.letterSize);
-		context->engine.width(key.letterSize);
-	}
-	return context;
-}
-
-void Generator::calcAtlasParams(const std::wstring &text, aggdef::FontContext &fontCntx,
-	uint32_t &width, uint32_t &height, int32_t &heightOffset) {
-
-	fontCntx.manager.reset_last_glyph();
-
-	width = 0; height = 0;
-	heightOffset = std::numeric_limits<int32_t>::max();
-
-	double x = kBorderWidth;
-	const wchar_t* p = text.c_str();
-	while (*p) {
-
-		fontCntx.manager.reset_last_glyph();
-		const agg::glyph_cache* glyph = fontCntx.manager.glyph(*p);
-		if (glyph == 0) {
-			throw std::runtime_error("Cannot load glyph: " +
-				aggdef::freeTypeError(fontCntx.engine.last_error()));
-		}
-		if (!(glyph->bounds.x1 == 0 && glyph->bounds.x2 == 0 &&
-			  glyph->bounds.y1 == 0 && glyph->bounds.y2 == 0)) {
-
-			if (*p != kSpaceSymbol) {
-				height = std::max<uint32_t>(height, glyph->bounds.y2 - glyph->bounds.y1);
-				heightOffset = std::min(heightOffset, glyph->bounds.y1);
-			}
-			x += (*p == kSpaceSymbol ? kSpaceFactor : 1.0f) * glyph->advance_x + kBorderSize;
-		}
-		++p;
-	}
-	width = (uint32_t)ceil(x);
-	height += -heightOffset + kBorderSize;
-}
-
-void Generator::renderFont(aggdef::FontContext& fontCntx, void* buff, uint32_t width,
-	uint32_t height, uint32_t stride, int32_t heightOffset, Letters& letters) {
-
-	letters.clear();
-
-	agg::rendering_buffer buffer((unsigned char*)buff, width, height, stride);
-	aggdef::PixelFormat pxlFormat(buffer);
-	aggdef::Renderer renderer(pxlFormat);
-	renderer.clear(0);
-
-	agg::renderer_scanline_aa_solid<aggdef::Renderer> glyphRenderer(renderer);
-	glyphRenderer.color(255);
-
-	aggdef::FontScanline& sl = fontCntx.manager.gray8_scanline();
-	aggdef::FontAdaptor& adaptor = fontCntx.manager.gray8_adaptor();
-
-	double x = kBorderWidth, y = -heightOffset + kBorderWidth, gWidth = 0.0;
-	const wchar_t* p = alphabet_.c_str();
-	while (*p) {
-
-		fontCntx.manager.reset_last_glyph();
-		const agg::glyph_cache* glyph = fontCntx.manager.glyph((uint32_t)*p);
-		if (glyph == 0) {
-			throw std::runtime_error("Cannot load glyph: " +
-				aggdef::freeTypeError(fontCntx.engine.last_error())); //! ASSERT
-		}
-
-		if (!(glyph->bounds.x1 == 0 && glyph->bounds.x2 == 0 &&
-			glyph->bounds.y1 == 0 && glyph->bounds.y2 == 0)) {
-
-			if (*p != kSpaceSymbol) {
-				fontCntx.manager.init_embedded_adaptors(glyph, x, y);
-				agg::render_scanlines(adaptor, sl, glyphRenderer);
-			}
-
-			gWidth = std::max(glyph->advance_x,
-				(double)(glyph->bounds.x2 - glyph->bounds.x1));
-			if (*p == kSpaceSymbol) {
-				gWidth *= kSpaceFactor;
-			}
-			letters[*p] = Rect((uint32_t)x, 0, (uint32_t)(x + gWidth), height);
-			x += gWidth + kBorderSize;
-		}
-		++p;
-	}
-}
-
-bool FontImpl::init(Error::Code& errorCode, std::string& errorDesc) {
+bool FontImpl::init(Error::Code& errorCode) {
 
 	static Generator generator;
-	atlas_ = generator.atlas(filePath_, letterSize_, letters_, errorCode, errorDesc);
+	atlas_ = generator.atlas(filePath_, letterSize_, letters_, errorCode);
 	return atlas_ != nullptr;
 }
 
-FontPtr makeFont(const char* filePath, uint32_t letterSize,
-	Error::Code& errorCode, std::string& errorDesc) {
+FontPtr makeFont(const char* filePath, uint32_t letterSize, Error::Code& errorCode) {
 
 	auto font = std::make_shared<FontImpl>(filePath, letterSize);
-	if (!font->init(errorCode, errorDesc)) {
+	if (!font->init(errorCode)) {
 		return FontPtr();
 	}
 	return font;
@@ -238,10 +225,9 @@ FontPtr makeFont(const char* filePath, uint32_t letterSize,
 FontPtr makeFont(const char* filePath, uint32_t letterSize) {
 
 	auto errorCode = Code::NoError;
-	std::string errorDesc;
-	auto font = makeFont(filePath, letterSize, errorCode, errorDesc);
+	auto font = makeFont(filePath, letterSize, errorCode);
 	if (!font) {
-		throw error(errorCode, errorDesc);
+		throw error(errorCode);
 	}
 	return font;
 }

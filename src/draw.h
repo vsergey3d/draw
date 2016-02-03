@@ -12,6 +12,11 @@
 //#define SHARED_PTR
 //#define MAKE_SHARED
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 namespace draw {
 
 class Error : public std::exception {
@@ -242,8 +247,7 @@ public:
 using FontPtr = std::shared_ptr<Font>;
 
 FontPtr makeFont(const char* filePath, uint32_t letterSize);
-FontPtr makeFont(const char* filePath, uint32_t letterSize,
-	Error::Code& errorCode, std::string& errorDesc); //nothrow
+FontPtr makeFont(const char* filePath, uint32_t letterSize, Error::Code& errorCode); //nothrow
 
 class Text : public Visual {
 
