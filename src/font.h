@@ -8,32 +8,33 @@ static const wchar_t kSpaceSymbol = L' ';
 
 using Letters = std::unordered_map<wchar_t, Rect>;
 
+class RendererImpl;
+
 class FontImpl final : public Font {
 
 public:
-	FontImpl(const char* filePath, uint32_t letterSize) :
-		filePath_(filePath), letterSize_(letterSize) {}
-	virtual ~FontImpl() = default;
+    FontImpl(RendererImpl& renderer, const char* filePath, uint32_t letterSize);
+    virtual ~FontImpl() = default;
 
-	FontImpl(const FontImpl&) = delete;
-	FontImpl& operator = (const FontImpl&) = delete;
+    FontImpl(const FontImpl&) = delete;
+    FontImpl& operator = (const FontImpl&) = delete;
 
-	bool init(Error::Code& errorCode);
+    bool init();
+    ImagePtr atlas() const { return atlas_; }
+    const Letters& letters() const { return letters_; }
 
-	ImagePtr atlas() const { return atlas_; }
-	const Letters& letters() const { return letters_; }
+    // Font
 
-	// Font
-
-	virtual const char* filePath() const final { return filePath_.c_str(); }
-	virtual uint32_t letterSize() const final { return letterSize_; }
+    virtual const char* filePath() const final { return filePath_.c_str(); }
+    virtual uint32_t letterSize() const final { return letterSize_; }
 
 private:
+	RendererImpl& renderer_;
 	std::string filePath_;
-	uint32_t letterSize_ {0};
+    uint32_t letterSize_ {0};
 
-	ImagePtr atlas_;
-	Letters letters_;
+    ImagePtr atlas_;
+    Letters letters_;
 };
 
 } // namespace draw

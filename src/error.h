@@ -3,38 +3,58 @@
 
 namespace draw {
 
+using Code = Error::Code;
+
+#ifndef DRAW_NO_EXCEPTIONS
+
 class ErrorImpl final : public Error {
 
 public:
-    ErrorImpl(Code code) : code_(code) {} //noexcept
-    ErrorImpl(Code code, const char* desc) : code_(code), desc_(desc) {} //noexcept
+    ErrorImpl(Code code) :
+        code_(code) {
+        ASSERT(code != Code::NoError);
+    }
     virtual ~ErrorImpl() = default;
 
-    virtual const char* desc() const final { return desc_.c_str(); } //noexcept
     virtual Code code() const final { return code_; } //noexcept
 
-    virtual const char* what() const noexcept final { return desc_.c_str(); } //noexcept
+    virtual const char* what() const NOEXCEPT final {
+
+        switch (code_) {
+        case Code::OpenGLAbsentFeature: return "opengl absent feature";
+        case Code::OpenGLOutOfMemory: return "opengl out of memory";
+        case Code::InvalidArgument: return "invalid argument";
+        case Code::InvalidFontFile: return "invalid font file";
+        case Code::AbsentFontGlyph: return "absent font glyph";
+        default:
+            ASSERT(!"one of the error code cases is not handled");
+        }
+        return "";
+    } //noexcept
 
 private:
     Code code_;
-    std::string desc_;
 };
 
-using Code = Error::Code;
+inline bool error(Code code) {
 
-inline ErrorImpl error(Code code) {
-
-    return ErrorImpl(code);
+    ASSERT(code != Code::NoError);
+    throw ErrorImpl(code);
+    //return false;
 }
 
-inline ErrorImpl error(Code code, const char* desc) {
+#else
 
-    return ErrorImpl(code, desc);
+static Code gLastError = Code::NoError;
+Code getLastError() { return gLastError; }
+
+inline bool error(Code code) {
+
+    ASSERT(code != Code::NoError);
+    gLastError = code;
+    return false;
 }
 
-inline ErrorImpl error(Code code, const std::string& desc) {
-
-    return ErrorImpl(code, desc.c_str());
-}
+#endif
 
 } // namespace draw

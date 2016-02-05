@@ -1,40 +1,37 @@
 #pragma once
 #include <draw.h>
-#include <gl.h>
+#include <GL/glew.h>
 
 namespace draw {
+
+class RendererImpl;
 
 class ImageImpl final : public Image {
 
 public:
-	ImageImpl(uint32_t width, uint32_t height, Format format, bool filter);
-	virtual ~ImageImpl();
+    ImageImpl(RendererImpl& renderer, const Size& size, Format format, bool filter);
+    virtual ~ImageImpl();
 
-	ImageImpl(const ImageImpl&) = delete;
-	ImageImpl& operator = (const ImageImpl&) = delete;
+    ImageImpl(const ImageImpl&) = delete;
+    ImageImpl& operator = (const ImageImpl&) = delete;
 
-	bool init(Error::Code& errorCode);
+    bool init();
+    GLuint handle() { return handle_; }
 
-	GLuint handle() { return glTexture_; }
+    // Image
 
-	// Image
+    virtual const Size& size() const final { return size_; }
+    virtual Format format() const final { return format_; }
+    virtual bool filter() const final { return filter_; }
 
-	virtual Format format() const final { return format_; }
-	virtual uint32_t width() const final { return width_; }
-	virtual uint32_t height() const final { return height_; }
-
-	virtual void upload(const uint8_t* data, uint32_t byteSize) final;
-	virtual bool upload(const uint8_t* data, uint32_t byteSize, Error::Code& errorCode) final;
+    virtual bool upload(Bytes data) final;
 
 private:
-	uint32_t width_ {0};
-	uint32_t height_ {0};
-	Format format_ {Format::RGB};
-	bool filter_ {false};
-
-	GLuint glTexture_ {0};
-	GLenum glFormat_ {0};
-	GLenum glInternalFormat_ {0};
+    RendererImpl& renderer_;
+    Size size_ {0, 0};
+    Format format_ {Format::RGB};
+    bool filter_ {false};
+    GLuint handle_ {0};
 };
 
 } // namespace draw

@@ -24,8 +24,8 @@ cd ..\..
 mkdir lib
 mkdir lib\mingw_lib
 mkdir lib\msvc_lib
-copy "build\mingw\debug\*.a" "lib\mingw_lib"
-copy "build\mingw\release\*.a" "lib\mingw_lib"
-copy "build\msvc\Debug\*.lib" "lib\msvc_lib"
-copy "build\msvc\Release\*.lib" "lib\msvc_lib"
+copy "build\mingw\debug\libdrawd.a" "lib\mingw_lib"
+copy "build\mingw\release\libdraw.a" "lib\mingw_lib"
+copy "build\msvc\Debug\drawd.lib" "lib\msvc_lib"
+copy "build\msvc\Release\draw.lib" "lib\msvc_lib"
 
