@@ -13,13 +13,22 @@ GeometryImpl::GeometryImpl(RendererImpl& renderer, Geometry::Vertices vertices,
     primitive_(primitive) {
 }
 
+GeometryImpl::~GeometryImpl() {
+
+    renderer_.setContext();
+
+    glDeleteBuffers(1, &vb_);
+    glDeleteBuffers(1, &ib_);
+}
+
 bool GeometryImpl::init() {
 
     if (!vertices_.data || vertices_.count <= 0 ||
         vertices_.count >= std::numeric_limits<Index>::max() ||
-        !indices_.data || indices_.count <= 0)
-        return error(Code::InvalidArgument);
-
+        !indices_.data || indices_.count <= 0) {
+        setError(Code::InvalidArgument);
+        return false;
+    }
     renderer_.setContext();
 
     glGenBuffers(1, &vb_);
@@ -32,19 +41,12 @@ bool GeometryImpl::init() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * indices_.count,
         indices_.data, GL_STATIC_DRAW);
 
-    if (glGetError() == GL_OUT_OF_MEMORY)
-        return error(Code::OpenGLOutOfMemory);
-
+    if (glGetError() == GL_OUT_OF_MEMORY) {
+        setError(Code::OutOfMemory);
+        return false;
+    }
     ASSERT(glGetError() == GL_NO_ERROR);
     return true;
-}
-
-GeometryImpl::~GeometryImpl() {
-
-    renderer_.setContext();
-
-    glDeleteBuffers(1, &vb_);
-    glDeleteBuffers(1, &ib_);
 }
 
 } // namespace draw

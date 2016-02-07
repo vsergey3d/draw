@@ -42,12 +42,20 @@ ImageImpl::ImageImpl(RendererImpl& renderer, const Size& size,
     filter_(filter) {
 }
 
+ImageImpl::~ImageImpl() {
+
+    renderer_.setContext();
+
+    glDeleteTextures(1, &handle_);
+}
+
 bool ImageImpl::init() {
 
     if (size_.width <= 0 || size_.width > Image::kMaxSize ||
-        size_.height <= 0 || size_.height > Image::kMaxSize)
-        return error(Code::InvalidArgument);
-
+        size_.height <= 0 || size_.height > Image::kMaxSize) {
+        setError(Code::InvalidArgument);
+        return false;
+    }
     renderer_.setContext();
 
     glGenTextures(1, &handle_);
@@ -64,26 +72,21 @@ bool ImageImpl::init() {
     glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat(format_), size_.width,
         size_.height, 0, glFormat(format_), GL_UNSIGNED_BYTE, nullptr);
 
-    if (glGetError() == GL_OUT_OF_MEMORY)
-        return error(Code::OpenGLOutOfMemory);
-
+    if (glGetError() == GL_OUT_OF_MEMORY) {
+        setError(Code::OutOfMemory);
+        return false;
+    }
     ASSERT(glGetError() == GL_NO_ERROR);
     return true;
 }
 
-ImageImpl::~ImageImpl() {
-
-    renderer_.setContext();
-
-    glDeleteTextures(1, &handle_);
-}
-
-bool ImageImpl::upload(Bytes data) {
+void ImageImpl::upload(Bytes data) {
 
     if (!data.data ||
-        data.count != (uint32_t)size_.width * size_.height * bpp(format_))
-        return error(Code::InvalidArgument);
-
+        data.count != uint32_t(size_.width * size_.height * bpp(format_))) {
+        setError(Code::InvalidArgument);
+        return;
+    }
     renderer_.setContext();
 
     glBindTexture(GL_TEXTURE_2D, handle_);
@@ -91,7 +94,6 @@ bool ImageImpl::upload(Bytes data) {
         size_.height, 0, glFormat(format_), GL_UNSIGNED_BYTE, data.data);
 
     ASSERT(glGetError() == GL_NO_ERROR);
-    return true;
 }
 
 } // namespace draw

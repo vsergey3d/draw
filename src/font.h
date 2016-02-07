@@ -32,9 +32,8 @@ private:
 	RendererImpl& renderer_;
 	std::string filePath_;
     uint32_t letterSize_ {0};
-
-    ImagePtr atlas_;
-    Letters letters_;
+	Letters letters_;
+	ImagePtr atlas_;
 };
 
 } // namespace draw

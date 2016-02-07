@@ -116,6 +116,25 @@ void ShapeImpl::color(const Color& color) {
         instance_->color = packColor(color_);
 }
 
+void ShapeImpl::transparency(bool value) {
+
+    bool current = (key_.fillMode == FillMode::Transparent);
+    if (current != value) {
+        if (visibility_) removeInstance();
+        key_.fillMode = value ? FillMode::Transparent : FillMode::Solid;
+        if (visibility_) addInstance();
+    }
+}
+
+void ShapeImpl::geometry(GeometryPtr geometry) {
+
+    if (key_.geometry != geometry) {
+        if (visibility_) removeInstance();
+        key_.geometry = geometry;
+        if (visibility_) addInstance();
+    }
+}
+
 void ShapeImpl::image(ImagePtr atlas, const Rect& element, const Vector2& tile) {
 
     element_ = element;

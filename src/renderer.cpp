@@ -108,13 +108,11 @@ public:
 
 private:
     RendererImpl& renderer_;
-
+    Attributes attributes_;
+    Uniforms uniforms_;
     GLuint vs_ {0};
     GLuint fs_ {0};
     GLuint handle_ {0};
-
-    Attributes attributes_;
-    Uniforms uniforms_;
 };
 
 inline uint32_t typeByteSize(GLenum type) {
@@ -124,19 +122,6 @@ inline uint32_t typeByteSize(GLenum type) {
     case GL_FLOAT: return 4;
     }
     return 0;
-}
-
-inline void bindAttribute(GLuint location, GLenum type, bool normalized,
-    uint32_t size, uint32_t stride, uint32_t& offset, bool perInstance = false) {
-
-    glEnableVertexAttribArray(location);
-
-    auto norm = GLboolean(normalized ? GL_TRUE : GL_FALSE);
-    glVertexAttribPointer(location, size, type, norm, stride, (char*)0 + offset);
-    offset += typeByteSize(type) * size;
-
-    if (perInstance)
-        glVertexAttribDivisor(location, 1);
 }
 
 namespace shaders {
@@ -191,16 +176,25 @@ RendererImpl::RendererImpl(ContextPtr context) :
     context_(std::move(context)) {
 }
 
-bool RendererImpl::init() {
-
-    if (!context_)
-        return error(Code::InvalidArgument);
+RendererImpl::~RendererImpl() {
 
     setContext();
-    if (glewInit() != GLEW_OK ||
-        !glewIsSupported("GL_VERSION_2_0  GL_ARB_draw_instanced"))
-        return error(Code::OpenGLAbsentFeature);
 
+    glDeleteBuffers(1, &glBuffer_);
+}
+
+bool RendererImpl::init() {
+
+    if (!context_) {
+        setError(Code::InvalidArgument);
+        return false;
+    }
+    setContext();
+    if (glewInit() != GLEW_OK ||
+        !glewIsSupported("GL_VERSION_2_0  GL_ARB_draw_instanced")) {
+        setError(Code::OpenGLAbsentFeature);
+        return false;
+    }
     glDisable(GL_DITHER);
     glDisable(GL_STENCIL_TEST);
 
@@ -214,7 +208,7 @@ bool RendererImpl::init() {
         {{0.0f, 1.0f}, {0.0f, 1.0f}}
     };
     static const Geometry::Index kQuadIndices[] = {0, 1, 2, 2, 3, 0};
-    rectGeom_ = makeGeometry(
+    rectGeometry_ = makeGeometry(
         {kQuadVertices, sizeof(kQuadVertices) / sizeof(Geometry::Vertex)},
         {kQuadIndices, sizeof(kQuadIndices) / sizeof(Geometry::Index)},
         Geometry::Primitive::Triangle);
@@ -224,21 +218,15 @@ bool RendererImpl::init() {
     stubImage_->upload({kWhiteTexel, sizeof(kWhiteTexel)});
 
     using namespace shaders;
-    geomProgram_ = make_unique<Program>(*this, kVS, kGeomFS);
+    geometryProgram_ = make_unique<Program>(*this, kVS, kGeomFS);
     fontProgram_ = make_unique<Program>(*this, kVS, kFontFS);
 
-    if (glGetError() == GL_OUT_OF_MEMORY)
-        return error(Code::OpenGLOutOfMemory);
-
+    if (glGetError() == GL_OUT_OF_MEMORY) {
+        setError(Code::OutOfMemory);
+        return false;
+    }
     ASSERT(glGetError() == GL_NO_ERROR);
     return true;
-}
-
-RendererImpl::~RendererImpl() {
-
-    setContext();
-
-    glDeleteBuffers(1, &glBuffer_);
 }
 
 void RendererImpl::resizeDataBuffer(uint32_t size) {
@@ -249,20 +237,24 @@ void RendererImpl::resizeDataBuffer(uint32_t size) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(Instance) * size, nullptr, GL_DYNAMIC_DRAW);
     ASSERT(glGetError() == GL_NO_ERROR);
 
-    //if (glGetError() == GL_OUT_OF_MEMORY)
-    //    return error(Code::OpenGLOutOfMemory);
-
+    if (glGetError() == GL_OUT_OF_MEMORY) {
+        setError(Code::OutOfMemory);
+        return;
+    }
     dataBuffer_.resize(size);
 }
 
 Instance* RendererImpl::add(const Key& key) {
 
     auto& batch = batches_[key];
-
-    batch.emplace_back(make_unique<Instance>());
-    if (batch.size() > dataBuffer_.size())
+    TRY {
+        batch.emplace_back(make_unique<Instance>());
+        if (batch.size() > dataBuffer_.size())
         resizeDataBuffer(dataBuffer_.size() * kDataGrowthFactor);
-
+    }
+    CATCH {
+        setError(Code::OutOfMemory);
+    };
     return batch.back().get();
 }
 
@@ -289,11 +281,9 @@ Program* RendererImpl::getProgram(FillMode fillMode) {
     switch (fillMode) {
     case FillMode::Solid:
     case FillMode::Transparent:
-        return geomProgram_.get();
+        return geometryProgram_.get();
     case FillMode::Font:
         return fontProgram_.get();
-    //default:
-    //    ASSERT(!"program is not defined for specified fill mode");
     }
     return nullptr;
 }
@@ -314,8 +304,6 @@ inline void setupFillMode(FillMode fillMode) {
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         break;
-    //default:
-    //    ASSERT(!"one of the fill mode cases is not handled");
     }
 }
 
@@ -330,6 +318,19 @@ inline void bindImage(Program* program, ImageImpl* image) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, image->handle());
     glUniform1i(program->uniforms().image, 0);
+}
+
+inline void bindAttribute(GLuint location, GLenum type, bool normalized,
+    uint32_t size, uint32_t stride, uint32_t& offset, bool perInstance = false) {
+
+    glEnableVertexAttribArray(location);
+
+    auto norm = GLboolean(normalized ? GL_TRUE : GL_FALSE);
+    glVertexAttribPointer(location, size, type, norm, stride, (char*)0 + offset);
+    offset += typeByteSize(type) * size;
+
+    if (perInstance)
+        glVertexAttribDivisor(location, 1);
 }
 
 inline void bindGeometry(Program* program, GeometryImpl* geometry) {
@@ -352,25 +353,23 @@ inline GLuint glPrimitive(Geometry::Primitive primitive) {
         return GL_LINES;
     case Geometry::Primitive::Triangle:
         return GL_TRIANGLES;
-    //default:
-    //    ASSERT(!"one of the primitive cases is not handled");
     }
     return 0;
 }
 
-inline void setupScreen(const Size& screen, const Color& clearColor) {
+inline void setupScreen(const Size& screen, const Color& clear) {
 
     glViewport(0, 0, screen.width, screen.height);
 
-    glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+    glClearColor(clear.r, clear.g, clear.b, clear.a);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-uint32_t RendererImpl::draw(const Size& screen, const Color& clearColor) {
+uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
 
     setContext();
-    setupScreen(screen, clearColor);
+    setupScreen(screen, clear);
 
     GeometryImpl* lastGeometry = nullptr;
     ImageImpl* lastImage = nullptr;
@@ -448,22 +447,19 @@ FontPtr RendererImpl::makeFont(const char* filePath, uint32_t letterSize) {
 ShapePtr RendererImpl::makeRect(FillMode fillMode) {
 
     return std::make_shared<ShapeImpl>(*this,
-        Key(fillMode, 0, rectGeom_, nullptr));
+        Key(fillMode, 0, rectGeometry_, nullptr));
 }
 
-ShapePtr RendererImpl::makeRect(bool transparent) {
+ShapePtr RendererImpl::makeRect() {
 
     return std::make_shared<ShapeImpl>(*this,
-        Key(transparent ? FillMode::Transparent : FillMode::Solid, 0, rectGeom_, nullptr));
+        Key(FillMode::Solid, 0, rectGeometry_, nullptr));
 }
 
-ShapePtr RendererImpl::makeShape(GeometryPtr geometry, bool transparent) {
-
-    if (!geometry)
-        error(Code::InvalidArgument);
+ShapePtr RendererImpl::makeShape() {
 
     return std::make_shared<ShapeImpl>(*this,
-        Key(transparent ? FillMode::Transparent : FillMode::Solid, 0, geometry, nullptr));
+        Key(FillMode::Solid, 0, nullptr, nullptr));
 }
 
 TextPtr RendererImpl::makeText() {

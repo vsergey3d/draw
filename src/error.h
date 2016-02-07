@@ -16,44 +16,47 @@ public:
     }
     virtual ~ErrorImpl() = default;
 
-    virtual Code code() const final { return code_; } //noexcept
+    virtual Code code() const final { return code_; }
 
     virtual const char* what() const NOEXCEPT final {
 
         switch (code_) {
+        case Code::NoError: return "";
         case Code::OpenGLAbsentFeature: return "opengl absent feature";
-        case Code::OpenGLOutOfMemory: return "opengl out of memory";
+        case Code::OutOfMemory: return "out of memory";
         case Code::InvalidArgument: return "invalid argument";
         case Code::InvalidFontFile: return "invalid font file";
         case Code::AbsentFontGlyph: return "absent font glyph";
-        default:
-            ASSERT(!"one of the error code cases is not handled");
         }
         return "";
-    } //noexcept
+    }
 
 private:
     Code code_;
 };
 
-inline bool error(Code code) {
+void setError(Error::Code code) {
 
     ASSERT(code != Code::NoError);
     throw ErrorImpl(code);
-    //return false;
 }
+
+#define TRY try
+#define CATCH catch(...)
 
 #else
 
 static Code gLastError = Code::NoError;
 Code getLastError() { return gLastError; }
 
-inline bool error(Code code) {
+void setError(Error::Code code) {
 
     ASSERT(code != Code::NoError);
     gLastError = code;
-    return false;
 }
+
+#define TRY
+#define CATCH if (false)
 
 #endif
 

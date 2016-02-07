@@ -15,96 +15,6 @@
 
 namespace draw {
 
-using Glyph = agg::glyph_cache;
-
-struct FontContext {
-
-    using Engine = agg::font_engine_freetype_int32;
-
-    Engine engine;
-    agg::font_cache_manager<Engine> manager;
-
-    FontContext() : manager(engine) {}
-};
-
-template <typename Callable>
-bool forEachGlyph(FontContext& context, const std::wstring& text, Callable&& callable) {
-
-    for (auto c = text.c_str(); *c; ++c) {
-        context.manager.reset_last_glyph();
-
-        auto glyph = context.manager.glyph((uint32_t)*c);
-        if (!glyph)
-            return error(Code::AbsentFontGlyph);
-
-        const auto& b = glyph->bounds;
-        if (b.x1 != 0 || b.x2 != 0 || b.y1 != 0 || b.y2 != 0)
-            callable(*c, *glyph);
-    }
-    return true;
-}
-
-class AtlasRenderer {
-
-public:
-    AtlasRenderer(uint32_t width, uint32_t height) :
-        size_(width, height) {
-
-        auto byteSize = (size_t)size_.width * size_.height; // * 1bpp
-        if (buffer_.size() < byteSize) {
-            buffer_.resize(byteSize);
-        }
-        impl_ = make_unique<Impl>(buffer_.data(), size_.width, size_.height);
-    }
-    ~AtlasRenderer() = default;
-
-    AtlasRenderer(AtlasRenderer&) = delete;
-    AtlasRenderer& operator = (const AtlasRenderer&) = delete;
-
-    void renderGlyph(FontContext& context, const Glyph& glyph, double x, double y) {
-
-        context.manager.init_embedded_adaptors(&glyph, x, y);
-        agg::render_scanlines(context.manager.gray8_adaptor(),
-            context.manager.gray8_scanline(), impl_->glyphRenderer);
-    }
-
-    ImagePtr makeAtlas(RendererImpl& rendererImpl) {
-
-        auto atlas = rendererImpl.makeImage(size_, Image::Format::A, true);
-        atlas->upload(Bytes(buffer_.data(), buffer_.size()));
-        return atlas;
-    }
-
-private:
-    struct Impl {
-
-        using AggPixelFormat = agg::pixfmt_gray8;
-        using AggRenderer = agg::renderer_base<AggPixelFormat>;
-        using AggGlyphRenderer = agg::renderer_scanline_aa_solid<AggRenderer>;
-
-        agg::rendering_buffer renderBuffer;
-        AggPixelFormat pixelFormat;
-        AggRenderer renderer;
-        AggGlyphRenderer glyphRenderer;
-
-        Impl(uint8_t* buffer, uint32_t width, uint32_t height) :
-            renderBuffer(buffer, width, height, width),
-            pixelFormat(renderBuffer),
-            renderer(pixelFormat),
-            glyphRenderer(renderer) {
-
-            renderer.clear(0);
-            glyphRenderer.color(255);
-        }
-    };
-
-    Size size_ {0, 0};
-    std::unique_ptr<Impl> impl_;
-    static std::vector<uint8_t> buffer_;
-};
-
-std::vector<uint8_t> AtlasRenderer::buffer_{};
-
 class Generator {
 
 public:
@@ -117,7 +27,6 @@ public:
             alphabet_.push_back(c);
     }
     ~Generator() = default;
-
     Generator(Generator&) = delete;
     Generator& operator = (const Generator&) = delete;
 
@@ -136,7 +45,6 @@ public:
 
         if (!forEachGlyph(*context, alphabet_,
             [&x, &height, &heightOffset](wchar_t c, const Glyph& glyph) {
-
                 if (c != kSpaceSymbol) {
                     height = std::max<int32_t>(height, glyph.bounds.y2 - glyph.bounds.y1);
                     heightOffset = std::min(heightOffset, glyph.bounds.y1);
@@ -148,38 +56,90 @@ public:
         width = (int32_t)ceil(x);
         height += -heightOffset + kBorderSize;
 
-        AtlasRenderer renderer((uint32_t)width, (uint32_t)height);
+        auto renderer = makeRenderer((uint32_t)width, (uint32_t)height);
         x = kBorderWidth;
         y = -heightOffset + kBorderWidth;
 
         letters.clear();
         if (!forEachGlyph(*context, alphabet_,
             [&renderer, &context, &letters, &x, &y, &height](wchar_t c, const Glyph& glyph) {
-
                 if (c != kSpaceSymbol)
-                    renderer.renderGlyph(*context, glyph, x, y);
-
+                    renderer->renderGlyph(*context, glyph, x, y);
                 auto w = (c == kSpaceSymbol ? kSpaceFactor : 1.0f) *
                     std::max(glyph.advance_x, (double)(glyph.bounds.x2 - glyph.bounds.x1));
-
                 letters[c] = Rect((uint32_t)x, 0, (uint32_t)(x + w), height);
                 x += w + kBorderSize;
             })) {
             return ImagePtr();
         }
-        return renderer.makeAtlas(rendererImpl);
+        auto atlas = rendererImpl.makeImage({width, height}, Image::Format::A, true);
+        atlas->upload(Bytes(buffer_.data(), buffer_.size()));
+        return atlas;
     }
 
 private:
-    FontContext* getContext(const std::string& filePath, uint32_t letterSize) {
+    using Glyph = agg::glyph_cache;
+
+    struct Context {
+
+        using Engine = agg::font_engine_freetype_int32;
+
+        Engine engine;
+        agg::font_cache_manager<Engine> manager;
+
+        Context() : manager(engine) {}
+    };
+
+    class Renderer {
+
+    public:
+        Renderer(uint8_t* buffer, uint32_t width, uint32_t height) :
+            renderBuffer(buffer, width, height, width),
+            pixelFormat(renderBuffer),
+            renderer(pixelFormat),
+            glyphRenderer(renderer) {
+
+            renderer.clear(0);
+            glyphRenderer.color(255);
+        }
+        ~Renderer() = default;
+        Renderer(Renderer&) = delete;
+        Renderer& operator = (const Renderer&) = delete;
+
+        void renderGlyph(Context& context, const Glyph& glyph, double x, double y) {
+
+            context.manager.init_embedded_adaptors(&glyph, x, y);
+            agg::render_scanlines(context.manager.gray8_adaptor(),
+                context.manager.gray8_scanline(), glyphRenderer);
+        }
+    private:
+        using AggPixelFormat = agg::pixfmt_gray8;
+        using AggRenderer = agg::renderer_base<AggPixelFormat>;
+        using AggGlyphRenderer = agg::renderer_scanline_aa_solid<AggRenderer>;
+
+        agg::rendering_buffer renderBuffer;
+        AggPixelFormat pixelFormat;
+        AggRenderer renderer;
+        AggGlyphRenderer glyphRenderer;
+    };
+
+    std::unique_ptr<Renderer> makeRenderer(uint32_t width, uint32_t height) {
+
+        auto byteSize = (size_t)width * height; // * 1bpp
+        if (buffer_.size() < byteSize) {
+            buffer_.resize(byteSize);
+        }
+        return make_unique<Renderer>(buffer_.data(), width, height);
+    }
+
+    Context* getContext(const std::string& filePath, uint32_t letterSize) {
 
         auto& ctxt = cache_[filePath];
         if (!ctxt) {
-            ctxt = make_unique<FontContext>();
+            ctxt = make_unique<Context>();
             ASSERT(ctxt->engine.last_error() == 0);
-
             if (!ctxt->engine.load_font(filePath.c_str(), 0, agg::glyph_ren_native_gray8)) {
-                error(Code::InvalidFontFile);
+                setError(Code::InvalidFontFile);
                 return nullptr;
             }
         }
@@ -193,8 +153,26 @@ private:
         return ctxt.get();
     }
 
-    std::unordered_map<std::string, std::unique_ptr<FontContext>> cache_;
+    template <typename Callable>
+    bool forEachGlyph(Context& context, const std::wstring& text, Callable&& callable) {
+
+        for (auto c = text.c_str(); *c; ++c) {
+            context.manager.reset_last_glyph();
+            auto glyph = context.manager.glyph((uint32_t)*c);
+            if (!glyph) {
+                setError(Code::AbsentFontGlyph);
+                return false;
+            }
+            const auto& b = glyph->bounds;
+            if (b.x1 != 0 || b.x2 != 0 || b.y1 != 0 || b.y2 != 0)
+                callable(*c, *glyph);
+        }
+        return true;
+    }
+
     std::wstring alphabet_;
+    std::vector<uint8_t> buffer_;
+    std::unordered_map<std::string, std::unique_ptr<Context>> cache_;
 };
 
 FontImpl::FontImpl(RendererImpl& renderer, const char* filePath, uint32_t letterSize) :

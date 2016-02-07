@@ -4,7 +4,7 @@
 
 //#define THREAD_CHECK
 //#define SHARED_PTR
-#define DRAW_NO_EXCEPTIONS
+//#define DRAW_NO_EXCEPTIONS
 
 #ifndef ASSERT
 #include <cassert>
@@ -40,7 +40,7 @@ public:
 
         NoError = 0,
         OpenGLAbsentFeature,
-        OpenGLOutOfMemory,
+        OutOfMemory,
         InvalidArgument,
         InvalidFontFile,
         AbsentFontGlyph
@@ -159,9 +159,9 @@ public:
     };
     virtual ~Geometry() = 0;
 
-    virtual uint32_t vertexCount() const = 0; //nothrow
-    virtual uint32_t indexCount() const = 0; //nothrow
-    virtual Primitive primitive() const = 0; //nothrow
+    virtual uint32_t vertexCount() const = 0;
+    virtual uint32_t indexCount() const = 0;
+    virtual Primitive primitive() const = 0;
 };
 
 using GeometryPtr = std::shared_ptr<Geometry>;
@@ -179,11 +179,11 @@ public:
     };
     virtual ~Image() = 0;
 
-    virtual const Size& size() const = 0; //nothrow
-    virtual Format format() const = 0; //nothrow
-    virtual bool filter() const = 0; //nothrow
+    virtual const Size& size() const = 0;
+    virtual Format format() const = 0;
+    virtual bool filter() const = 0;
 
-    virtual bool upload(Bytes data) = 0; //nothrow
+    virtual void upload(Bytes data) = 0;
 };
 
 using ImagePtr = std::shared_ptr<Image>;
@@ -193,16 +193,16 @@ class Visual {
 public:
     virtual ~Visual() = 0;
 
-    virtual void visibility(bool enable) = 0; //nothrow
-    virtual bool visibility() const = 0; //nothrow
+    virtual void visibility(bool enable) = 0;
+    virtual bool visibility() const = 0;
 
-    virtual void order(uint32_t order) = 0; //nothrow
-    virtual uint32_t order() const = 0; //nothrow
+    virtual void order(uint32_t order) = 0;
+    virtual uint32_t order() const = 0;
 
-    virtual void position(const Point& position) = 0; //nothrow
-    virtual const Point& position() const = 0; //nothrow
+    virtual void position(const Point& position) = 0;
+    virtual const Point& position() const = 0;
 
-    virtual const Rect& bounds() const = 0; //nothrow
+    virtual const Rect& bounds() const = 0;
 };
 
 using VisualPtr = std::shared_ptr<Visual>;
@@ -212,18 +212,24 @@ class Shape : public Visual {
 public:
     virtual ~Shape() = 0;
 
-    virtual void size(const Size& size) = 0; //nothrow
-    virtual const Size& size() const = 0; //nothrow
+    virtual void size(const Size& size) = 0;
+    virtual const Size& size() const = 0;
 
-    virtual void color(const Color& color) = 0; //nothrow
-    virtual const Color& color() const = 0; //nothrow
+    virtual void color(const Color& color) = 0;
+    virtual const Color& color() const = 0;
 
-    virtual void image(ImagePtr image) = 0; //nothrow
-    virtual void image(ImagePtr image, const Vector2& tile) = 0; //nothrow
-    virtual ImagePtr image() const = 0; //nothrow
+    virtual void transparency(bool value) = 0;
+    virtual bool transparency() const = 0;
 
-    virtual void image(ImagePtr atlas, const Rect& element) = 0; //nothrow
-    virtual ImagePtr image(Rect& element) const = 0; //nothrow
+    virtual void geometry(GeometryPtr geometry) = 0;
+    virtual GeometryPtr geometry() const = 0;
+
+    virtual void image(ImagePtr image) = 0;
+    virtual void image(ImagePtr image, const Vector2& tile) = 0;
+    virtual ImagePtr image() const = 0;
+
+    virtual void image(ImagePtr atlas, const Rect& element) = 0;
+    virtual ImagePtr image(Rect& element) const = 0;
 };
 
 using ShapePtr = std::shared_ptr<Shape>;
@@ -233,8 +239,8 @@ class Font {
 public:
     virtual ~Font() = 0;
 
-    virtual const char* filePath() const = 0; //nothrow
-    virtual uint32_t letterSize() const = 0; //nothrow
+    virtual const char* filePath() const = 0;
+    virtual uint32_t letterSize() const = 0;
 };
 
 using FontPtr = std::shared_ptr<Font>;
@@ -244,14 +250,14 @@ class Text : public Visual {
 public:
     virtual ~Text() = 0;
 
-    virtual void font(FontPtr font) = 0; //nothrow
-    virtual FontPtr font() const = 0; //nothrow
+    virtual void font(FontPtr font) = 0;
+    virtual FontPtr font() const = 0;
 
-    virtual void text(const wchar_t* text) = 0; //nothrow
-    virtual const wchar_t* text() const = 0; //nothrow
+    virtual void text(const wchar_t* text) = 0;
+    virtual const wchar_t* text() const = 0;
 
-    virtual void color(const Color& color) = 0; //nothrow
-    virtual const Color& color() const = 0; //nothrow
+    virtual void color(const Color& color) = 0;
+    virtual const Color& color() const = 0;
 
     enum class HorizAlign {
 
@@ -260,8 +266,8 @@ public:
         Right
     };
 
-    virtual void horizAlign(HorizAlign alignment) = 0; //nothrow
-    virtual HorizAlign horizAlign() const = 0; //nothrow
+    virtual void horizAlign(HorizAlign alignment) = 0;
+    virtual HorizAlign horizAlign() const = 0;
 
     enum class VertAlign {
 
@@ -270,8 +276,8 @@ public:
         Bottom
     };
 
-    virtual void vertAlign(VertAlign alignment) = 0; //nothrow
-    virtual VertAlign vertAlign() const = 0; //nothrow
+    virtual void vertAlign(VertAlign alignment) = 0;
+    virtual VertAlign vertAlign() const = 0;
 };
 
 using TextPtr = std::shared_ptr<Text>;
@@ -286,11 +292,11 @@ public:
     virtual ImagePtr makeImage(const Size& size, Image::Format format, bool filter) = 0;
     virtual FontPtr makeFont(const char* filePath, uint32_t letterSize) = 0;
 
-    virtual ShapePtr makeRect(bool transparent) = 0;
-    virtual ShapePtr makeShape(GeometryPtr geometry, bool transparent) = 0;
+    virtual ShapePtr makeRect() = 0;
+    virtual ShapePtr makeShape() = 0;
     virtual TextPtr makeText() = 0;
 
-    virtual uint32_t draw(const Size& screen, const Color& clearColor) = 0; //nothrow
+    virtual uint32_t draw(const Size& screen, const Color& clear) = 0;
 };
 
 using RendererPtr = std::shared_ptr<Renderer>;

@@ -22,6 +22,12 @@ public:
     virtual void color(const Color& color) final;
     virtual const Color& color() const final { return color_; }
 
+    virtual void transparency(bool value) final;
+    virtual bool transparency() const final { return key_.fillMode == FillMode::Transparent ; }
+
+    virtual void geometry(GeometryPtr geometry) final;
+    virtual GeometryPtr geometry() const final { return key_.geometry; }
+
     virtual void image(ImagePtr image) final;
     virtual void image(ImagePtr image, const Vector2& tile) final;
     virtual ImagePtr image() const final { return key_.image; }

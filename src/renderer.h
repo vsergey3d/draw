@@ -38,15 +38,15 @@ public:
     virtual ImagePtr makeImage(const Size& size, Image::Format format, bool filter) final;
     virtual FontPtr makeFont(const char* filePath, uint32_t letterSize) final;
 
-    virtual ShapePtr makeRect(bool transparent) final;
-    virtual ShapePtr makeShape(GeometryPtr geometry, bool transparent) final;
+    virtual ShapePtr makeRect() final;
+    virtual ShapePtr makeShape() final;
     virtual TextPtr makeText() final;
 
-    virtual uint32_t draw(const Size& screen, const Color& clearColor) final;
+    virtual uint32_t draw(const Size& screen, const Color& clear) final;
 
 private:
     ContextPtr context_;
-    GeometryPtr rectGeom_;
+    GeometryPtr rectGeometry_;
     ImagePtr stubImage_;
 
     using InstancePtr = std::unique_ptr<Instance>;
@@ -60,7 +60,7 @@ private:
     GLuint glBuffer_ {0};
     void resizeDataBuffer(uint32_t size);
 
-    ProgramPtr geomProgram_;
+    ProgramPtr geometryProgram_;
     ProgramPtr fontProgram_;
     Program* getProgram(FillMode fillMode);
 };
