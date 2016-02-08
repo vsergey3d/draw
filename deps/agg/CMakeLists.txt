@@ -3,15 +3,18 @@ cmake_minimum_required(VERSION 3.1)
 set(AGG_LIB agg)
 project(${AGG_LIB} C CXX)
 
-if(MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(LIB_TYPE mingw_lib)
-	
-elseif(MSVC)
+if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 
     set(LIB_TYPE msvc_lib)
+elseif(UNIX OR CMAKE_COMPILER_IS_GNUCXX) 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	
+	set(LIB_TYPE unx_lib)
+	if(MINGW)
+		set(LIB_PATH mingw_lib)
+	endif()		
 endif()
 
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -45,17 +48,22 @@ set(SOURCE_FILES ${SRC_DIR}/agg_arc.cpp
     ${SRC_DIR}/agg_vpgen_clip_polyline.cpp
     ${SRC_DIR}/agg_vpgen_segmentator.cpp
     ${ROOT_DIR}/gpc/gpc.c
-    ${ROOT_DIR}/font_freetype/agg_font_freetype.cpp
-    ${ROOT_DIR}/font_win32_tt/agg_font_win32_tt.cpp)
+    ${ROOT_DIR}/font_freetype/agg_font_freetype.cpp)
 
+if(WIN32) 
+	set(SOURCE_FILES ${SOURCE_FILES} ${ROOT_DIR}/font_win32_tt/agg_font_win32_tt.cpp)
+endif()
+	
 include_directories(${INCLUDE_DIR} ${ROOT_DIR}/../freetype2/include)
 
 add_library(${AGG_LIB} STATIC ${SOURCE_FILES})
 
 set_target_properties(${AGG_LIB} PROPERTIES DEBUG_POSTFIX d)
 
-set(FONT_FILES ${ROOT_DIR}/font_freetype/agg_font_freetype.h
-        ${ROOT_DIR}/font_win32_tt/agg_font_win32_tt.h)
+set(FONT_FILES ${ROOT_DIR}/font_freetype/agg_font_freetype.h)
+if(WIN32) 
+	set(FONT_FILES ${SOURCE_FILES} ${ROOT_DIR}/font_win32_tt/agg_font_win32_tt.h)
+endif()
 set(GPC_H  ${ROOT_DIR}/gpc/gpc.h)
 file(COPY ${FONT_FILES} ${GPC_H} DESTINATION ${INCLUDE_DIR})
 

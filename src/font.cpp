@@ -20,7 +20,7 @@ class Generator {
 public:
     Generator() {
 
-        static const auto kMinCharCode = 32u, kMaxCharCode = 126u;
+        static const wchar_t kMinCharCode = 32, kMaxCharCode = 126;
 
         alphabet_.reserve(kMaxCharCode - kMinCharCode);
         for (wchar_t c = kMinCharCode; c <= kMaxCharCode; ++c)

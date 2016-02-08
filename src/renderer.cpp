@@ -339,7 +339,7 @@ inline void bindGeometry(Program* program, GeometryImpl* geometry) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->ib());
 
     const auto& attributes = program->attributes();
-    auto offset = 0u, stride = sizeof(Geometry::Vertex);
+    uint32_t offset = 0u, stride = sizeof(Geometry::Vertex);
     bindAttribute(attributes.pos, GL_FLOAT, false, 2, stride, offset);
     bindAttribute(attributes.uv, GL_FLOAT, false, 2, stride, offset);
 }
@@ -417,7 +417,7 @@ uint32_t RendererImpl::bindBatch(Program* program, const Batch& batch) {
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Instance) * count, &dataBuffer_[0]);
 
     const auto& attributes = program->attributes();
-    auto offset = 0u, stride = sizeof(Instance);
+    uint32_t offset = 0u, stride = sizeof(Instance);
     bindAttribute(attributes.posFrame, GL_FLOAT, false, 4, stride, offset, true);
     bindAttribute(attributes.uvFrame, GL_FLOAT, false, 4, stride, offset, true);
     bindAttribute(attributes.color, GL_UNSIGNED_BYTE, true, 4, stride, offset, true);

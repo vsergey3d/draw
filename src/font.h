@@ -1,5 +1,6 @@
 #pragma once
 #include <draw.h>
+#include <string>
 #include <unordered_map>
 
 namespace draw {
