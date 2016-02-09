@@ -35,7 +35,7 @@ private:
     Code code_;
 };
 
-void setError(Error::Code code) {
+inline void setError(Error::Code code) {
 
     ASSERT(code != Code::NoError);
     throw ErrorImpl(code);
@@ -47,9 +47,9 @@ void setError(Error::Code code) {
 #else
 
 static Code gLastError = Code::NoError;
-Code getLastError() { return gLastError; }
+static Code getLastError() { return gLastError; }
 
-void setError(Error::Code code) {
+inline void setError(Error::Code code) {
 
     ASSERT(code != Code::NoError);
     gLastError = code;
