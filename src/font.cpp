@@ -15,6 +15,11 @@
 
 namespace draw {
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 class Generator {
 
 public:
@@ -73,7 +78,7 @@ public:
             return ImagePtr();
         }
         auto atlas = rendererImpl.makeImage({width, height}, Image::Format::A, true);
-        atlas->upload(Bytes(buffer_.data(), buffer_.size()));
+        atlas->upload(Image::Bytes(buffer_.data(), buffer_.size()));
         return atlas;
     }
 
@@ -139,7 +144,7 @@ private:
             ctxt = make_unique<Context>();
             ASSERT(ctxt->engine.last_error() == 0);
             if (!ctxt->engine.load_font(filePath.c_str(), 0, agg::glyph_ren_native_gray8)) {
-                setError(Code::InvalidFontFile);
+                setError(InvalidFontFile);
                 return nullptr;
             }
         }
@@ -160,7 +165,7 @@ private:
             context.manager.reset_last_glyph();
             auto glyph = context.manager.glyph((uint32_t)*c);
             if (!glyph) {
-                setError(Code::AbsentFontGlyph);
+                setError(AbsentFontGlyph);
                 return false;
             }
             const auto& b = glyph->bounds;

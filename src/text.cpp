@@ -151,11 +151,9 @@ void TextImpl::text(const wchar_t* text) {
 
 void TextImpl::color(const Color& color) {
 
-    if (color_ != color) {
-        color_ = color;
-        for (size_t i = 0; i < shapeCount_; ++i)
-            shapes_[i]->color(color_);
-    }
+    color_ = color;
+    for (size_t i = 0; i < shapeCount_; ++i)
+        shapes_[i]->color(color_);
 }
 
 void TextImpl::horizAlign(Text::HorizAlign alignment) {

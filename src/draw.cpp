@@ -33,29 +33,9 @@ bool operator != (const Rect& left, const Rect& right) {
     return !(left == right);
 }
 
-bool operator == (const Vector2& left, const Vector2& right) {
-
-    return left.x == right.x && left.y == right.y;
-}
-
-bool operator != (const Vector2& left, const Vector2& right) {
-
-    return !(left == right);
-}
-
-bool operator == (const Color& left, const Color& right) {
-
-    return left.r == right.r && left.g == right.g &&
-        left.b == right.b && left.a == right.a;
-}
-
-bool operator != (const Color& left, const Color& right) {
-
-    return !(left == right);
-}
-
+#ifndef DRAW_NO_EXCEPTIONS
 Error::~Error() {}
-
+#endif
 Geometry::~Geometry() {}
 
 Image::~Image() {}

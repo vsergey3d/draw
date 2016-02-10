@@ -10,6 +10,11 @@
 
 namespace draw {
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 inline GLuint getAttribLocation(GLuint program, const GLchar* name) {
 
     auto location = glGetAttribLocation(program, name);
@@ -186,13 +191,13 @@ RendererImpl::~RendererImpl() {
 bool RendererImpl::init() {
 
     if (!context_) {
-        setError(Code::InvalidArgument);
+        setError(InvalidArgument);
         return false;
     }
     setContext();
     if (glewInit() != GLEW_OK ||
         !glewIsSupported("GL_VERSION_2_0  GL_ARB_draw_instanced")) {
-        setError(Code::OpenGLAbsentFeature);
+        setError(OpenGLAbsentFeature);
         return false;
     }
     glDisable(GL_DITHER);
@@ -222,7 +227,7 @@ bool RendererImpl::init() {
     fontProgram_ = make_unique<Program>(*this, kVS, kFontFS);
 
     if (glGetError() == GL_OUT_OF_MEMORY) {
-        setError(Code::OutOfMemory);
+        setError(OpenGLOutOfMemory);
         return false;
     }
     ASSERT(glGetError() == GL_NO_ERROR);
@@ -238,7 +243,7 @@ void RendererImpl::resizeDataBuffer(uint32_t size) {
     ASSERT(glGetError() == GL_NO_ERROR);
 
     if (glGetError() == GL_OUT_OF_MEMORY) {
-        setError(Code::OutOfMemory);
+        setError(OpenGLOutOfMemory);
         return;
     }
     dataBuffer_.resize(size);
@@ -247,14 +252,10 @@ void RendererImpl::resizeDataBuffer(uint32_t size) {
 Instance* RendererImpl::add(const Key& key) {
 
     auto& batch = batches_[key];
-    TRY {
-        batch.emplace_back(make_unique<Instance>());
-        if (batch.size() > dataBuffer_.size())
+    batch.emplace_back(make_unique<Instance>());
+    if (batch.size() > dataBuffer_.size())
         resizeDataBuffer(dataBuffer_.size() * kDataGrowthFactor);
-    }
-    CATCH {
-        setError(Code::OutOfMemory);
-    };
+
     return batch.back().get();
 }
 

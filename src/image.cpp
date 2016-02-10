@@ -53,7 +53,7 @@ bool ImageImpl::init() {
 
     if (size_.width <= 0 || size_.width > Image::kMaxSize ||
         size_.height <= 0 || size_.height > Image::kMaxSize) {
-        setError(Code::InvalidArgument);
+        setError(InvalidArgument);
         return false;
     }
     renderer_.setContext();
@@ -73,18 +73,18 @@ bool ImageImpl::init() {
         size_.height, 0, glFormat(format_), GL_UNSIGNED_BYTE, nullptr);
 
     if (glGetError() == GL_OUT_OF_MEMORY) {
-        setError(Code::OutOfMemory);
+        setError(OpenGLOutOfMemory);
         return false;
     }
     ASSERT(glGetError() == GL_NO_ERROR);
     return true;
 }
 
-void ImageImpl::upload(Bytes data) {
+void ImageImpl::upload(Image::Bytes data) {
 
     if (!data.data ||
         data.count != uint32_t(size_.width * size_.height * bpp(format_))) {
-        setError(Code::InvalidArgument);
+        setError(InvalidArgument);
         return;
     }
     renderer_.setContext();

@@ -26,7 +26,7 @@ bool GeometryImpl::init() {
     if (!vertices_.data || vertices_.count <= 0 ||
         vertices_.count >= std::numeric_limits<Index>::max() ||
         !indices_.data || indices_.count <= 0) {
-        setError(Code::InvalidArgument);
+        setError(InvalidArgument);
         return false;
     }
     renderer_.setContext();
@@ -42,7 +42,7 @@ bool GeometryImpl::init() {
         indices_.data, GL_STATIC_DRAW);
 
     if (glGetError() == GL_OUT_OF_MEMORY) {
-        setError(Code::OutOfMemory);
+        setError(OpenGLOutOfMemory);
         return false;
     }
     ASSERT(glGetError() == GL_NO_ERROR);
