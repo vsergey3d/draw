@@ -1,6 +1,6 @@
 #pragma once
 #include <draw.h>
-#include <instance.h>
+#include <common.h>
 #include <GL/glew.h>
 #include <vector>
 #include <map>
@@ -25,7 +25,7 @@ public:
     Instance* add(const Key& key);
     void remove(const Key& key, Instance* instance);
 
-    ShapePtr makeRect(FillMode fillMode);
+    ShapePtr makeFontRect();
 
     // Renderer
 

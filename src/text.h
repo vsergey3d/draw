@@ -1,5 +1,6 @@
 #pragma once
-#include <instance.h>
+#include <draw.h>
+#include <common.h>
 #include <string>
 #include <vector>
 
@@ -59,8 +60,6 @@ private:
     std::wstring text_;
     std::vector<ShapePtr> shapes_;
     size_t shapeCount_ {0};
-
-    bool visibility_ {false};
     Point position_ {0, 0};
     Point alignOffset_ {0, 0};
     Size textSize_ {0, 0};
@@ -68,7 +67,7 @@ private:
     Color color_ {1.0f, 1.0f, 1.0f, 1.0f};
     HorizAlign horizAlign_ {HorizAlign::Left};
     VertAlign vertAlign_ {VertAlign::Top};
-
+    bool visibility_ {false};
 };
 
 } // namespace draw

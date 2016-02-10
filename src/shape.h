@@ -1,5 +1,6 @@
 #pragma once
-#include <instance.h>
+#include <draw.h>
+#include <common.h>
 
 namespace draw {
 
@@ -8,7 +9,7 @@ class RendererImpl;
 class ShapeImpl final : public Shape {
 
 public:
-    ShapeImpl(RendererImpl& renderer, const Key& key);
+    ShapeImpl(RendererImpl& renderer, FillMode fillMode = FillMode::Solid);
     virtual ~ShapeImpl();
 
     ShapeImpl(const ShapeImpl&) = delete;
@@ -23,14 +24,14 @@ public:
     virtual const Color& color() const final { return color_; }
 
     virtual void transparency(bool value) final;
-    virtual bool transparency() const final { return key_.fillMode == FillMode::Transparent ; }
+    virtual bool transparency() const final { return fillMode_ == FillMode::Transparent; }
 
     virtual void geometry(GeometryPtr geometry) final;
-    virtual GeometryPtr geometry() const final { return key_.geometry; }
+    virtual GeometryPtr geometry() const final { return geometry_; }
 
     virtual void image(ImagePtr image) final;
     virtual void image(ImagePtr image, const Vector2& tile) final;
-    virtual ImagePtr image() const final { return key_.image; }
+    virtual ImagePtr image() const final { return image_; }
 
     virtual void image(ImagePtr atlas, const Rect& element) final;
     virtual ImagePtr image(Rect& element) const final;
@@ -41,7 +42,7 @@ public:
     virtual bool visibility() const final { return visibility_; }
 
     virtual void order(uint32_t order) final;
-    virtual uint32_t order() const final { return key_.order; }
+    virtual uint32_t order() const final { return order_; }
 
     virtual void position(const Point& position) final;
     virtual const Point& position() const final { return position_; }
@@ -56,15 +57,17 @@ private:
 
     RendererImpl& renderer_;
     Instance* instance_ {nullptr};
-    Key key_;
-
-    bool visibility_ {false};
+    FillMode fillMode_;
+    GeometryPtr geometry_;
+    ImagePtr image_;
+    uint32_t order_;
     Point position_ {0, 0};
     Size size_ {0, 0};
     Rect bounds_ {0, 0, 0, 0};
+    Color color_ {1.0f, 1.0f, 1.0f, 1.0f};
     Rect element_ {0, 0, 1, 1};
     Vector2 tile_ {1.0f, 1.0f};
-    Color color_ {1.0f, 1.0f, 1.0f, 1.0f};
+    bool visibility_ {false};
 };
 
 } // namespace draw

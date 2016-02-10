@@ -10,11 +10,6 @@
 
 namespace draw {
 
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 inline GLuint getAttribLocation(GLuint program, const GLchar* name) {
 
     auto location = glGetAttribLocation(program, name);
@@ -183,8 +178,10 @@ RendererImpl::RendererImpl(ContextPtr context) :
 
 RendererImpl::~RendererImpl() {
 
-    setContext();
+    ASSERT(batches_.empty() &&
+        "all renderer's objects must be destroyed before the renderer itself");
 
+    setContext();
     glDeleteBuffers(1, &glBuffer_);
 }
 
@@ -387,12 +384,12 @@ uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
             bindProgram(program, frame);
             lastProgram = program;
         }
-        auto* image = static_cast<ImageImpl*>((key.image ? key.image : stubImage_).get());
+        auto* image = static_cast<ImageImpl*>(key.image ? key.image : stubImage_.get());
         if (lastImage != image || lastProgram != program) {
             bindImage(program, image);
             lastImage = image;
         }
-        auto* geometry = static_cast<GeometryImpl*>(key.geometry.get());
+        auto* geometry = static_cast<GeometryImpl*>(key.geometry);
         if (geometry) {
             if (lastGeometry != geometry) {
                 bindGeometry(program, geometry);
@@ -445,22 +442,23 @@ FontPtr RendererImpl::makeFont(const char* filePath, uint32_t letterSize) {
     return ptr->init() ? ptr : FontPtr();
 }
 
-ShapePtr RendererImpl::makeRect(FillMode fillMode) {
+ShapePtr RendererImpl::makeFontRect() {
 
-    return std::make_shared<ShapeImpl>(*this,
-        Key(fillMode, 0, rectGeometry_, nullptr));
+    auto ptr = std::make_shared<ShapeImpl>(*this, FillMode::Font);
+    ptr->geometry(rectGeometry_);
+    return ptr;
 }
 
 ShapePtr RendererImpl::makeRect() {
 
-    return std::make_shared<ShapeImpl>(*this,
-        Key(FillMode::Solid, 0, rectGeometry_, nullptr));
+    auto ptr = std::make_shared<ShapeImpl>(*this);
+    ptr->geometry(rectGeometry_);
+    return ptr;
 }
 
 ShapePtr RendererImpl::makeShape() {
 
-    return std::make_shared<ShapeImpl>(*this,
-        Key(FillMode::Solid, 0, nullptr, nullptr));
+    return std::make_shared<ShapeImpl>(*this);
 }
 
 TextPtr RendererImpl::makeText() {

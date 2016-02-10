@@ -27,9 +27,9 @@ inline uint32_t packColor(const Color& color) {
         (uint32_t(255 * color.b) << 16) | (uint32_t(255 * color.a) << 24);
 }
 
-ShapeImpl::ShapeImpl(RendererImpl& renderer, const Key& key) :
+ShapeImpl::ShapeImpl(RendererImpl& renderer, FillMode fillMode) :
     renderer_(renderer),
-    key_(key) {
+    fillMode_(fillMode) {
 }
 
 ShapeImpl::~ShapeImpl() {
@@ -39,7 +39,7 @@ ShapeImpl::~ShapeImpl() {
 
 void ShapeImpl::addInstance() {
 
-    instance_ = renderer_.add(key_);
+    instance_ = renderer_.add(Key(fillMode_, order_, geometry_.get(), image_.get()));
 
     auto& posFrame = instance_->posFrame;
     posFrame.x = (float)position_.x;
@@ -47,14 +47,14 @@ void ShapeImpl::addInstance() {
     posFrame.z = (float)size_.width;
     posFrame.w = (float)size_.height;
 
-    uvFrame(key_.image, element_, tile_, instance_->uvFrame);
+    uvFrame(image_, element_, tile_, instance_->uvFrame);
     instance_->color = packColor(color_);
 }
 
 void ShapeImpl::removeInstance() {
 
     if (instance_) {
-        renderer_.remove(key_, instance_);
+        renderer_.remove(Key(fillMode_, order_, geometry_.get(), image_.get()), instance_);
         instance_ = nullptr;
     }
 }
@@ -72,9 +72,9 @@ void ShapeImpl::visibility(bool enable) {
 
 void ShapeImpl::order(uint32_t order) {
 
-    if (key_.order != order) {
+    if (order_ != order) {
         if (visibility_) removeInstance();
-        key_.order = order;
+        order_ = order;
         if (visibility_) addInstance();
     }
 }
@@ -118,19 +118,19 @@ void ShapeImpl::color(const Color& color) {
 
 void ShapeImpl::transparency(bool value) {
 
-    bool current = (key_.fillMode == FillMode::Transparent);
+    bool current = (fillMode_ == FillMode::Transparent);
     if (current != value) {
         if (visibility_) removeInstance();
-        key_.fillMode = value ? FillMode::Transparent : FillMode::Solid;
+        fillMode_ = value ? FillMode::Transparent : FillMode::Solid;
         if (visibility_) addInstance();
     }
 }
 
 void ShapeImpl::geometry(GeometryPtr geometry) {
 
-    if (key_.geometry != geometry) {
+    if (geometry_ != geometry) {
         if (visibility_) removeInstance();
-        key_.geometry = geometry;
+        geometry_ = geometry;
         if (visibility_) addInstance();
     }
 }
@@ -140,13 +140,13 @@ void ShapeImpl::image(ImagePtr atlas, const Rect& element, const Vector2& tile) 
     element_ = element;
     tile_ = tile;
 
-    if (key_.image != atlas) {
+    if (image_ != atlas) {
         if (visibility_) removeInstance();
-        key_.image = atlas;
+        image_ = atlas;
         if (visibility_) addInstance();
     }
     else if (visibility_) {
-        uvFrame(key_.image, element_, tile_, instance_->uvFrame);
+        uvFrame(image_, element_, tile_, instance_->uvFrame);
     }
 }
 
@@ -175,7 +175,7 @@ void ShapeImpl::image(ImagePtr image, const Vector2& tile) {
 ImagePtr ShapeImpl::image(Rect& element) const {
 
     element = element_;
-    return key_.image;
+    return image_;
 }
 
 } // namespace draw

@@ -34,7 +34,7 @@ void TextImpl::buildLetter(wchar_t c, Point &pos, Size &size, uint32_t &shapeNum
 
     if (c != kSpaceSymbol) {
         if (shapeNum >= shapeCount_)
-            shapes_[shapeNum] = renderer_.makeRect(FillMode::Font);
+            shapes_[shapeNum] = renderer_.makeFontRect();
 
         auto& shape = shapes_[shapeNum];
         shape->image(static_cast<FontImpl*>(font_.get())->atlas(), rect);

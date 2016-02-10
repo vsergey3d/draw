@@ -1,24 +1,10 @@
 #pragma once
 #include <draw.h>
+#include <common.h>
 
 namespace draw {
 
 #ifndef DRAW_NO_EXCEPTIONS
-
-#if defined(__clang__)
-#if __has_feature(cxx_noexcept)
-#define HAS_NOEXCEPT
-#endif
-#elif !defined(__clang__) && \
-    defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || \
-    defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026
-#define HAS_NOEXCEPT
-#endif
-#ifdef HAS_NOEXCEPT
-#define NOEXCEPT noexcept
-#else
-#define NOEXCEPT
-#endif
 
 class ErrorImpl final : public Error {
 

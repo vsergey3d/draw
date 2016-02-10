@@ -150,7 +150,7 @@ struct Span {
         data(data), count(count) {}
 };
 
-//! Geometry vertex.
+//! Geometry.
 /*!
  * Represents an indexed 2D-geometry.
  * You should define your vertices in [0.0, 1.0] space as if it have fit to one pixel.
@@ -159,7 +159,7 @@ struct Span {
 class Geometry {
 
 public:
-    //! Geometry vertex.
+    //! Vertex.
     struct Vertex {
 
         //! 2D-position in [0.0, 1.0] space.
@@ -176,7 +176,7 @@ public:
     //! Continuous array of vertices.
     using Vertices = Span<Vertex>;
 
-    //! Index of geometry vertex.
+    //! Index of a vertex.
     using Index = uint16_t;
 
     //! Continuous array of indices.
