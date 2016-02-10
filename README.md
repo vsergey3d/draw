@@ -20,4 +20,4 @@ See [draw-wxWidgets](https://github.com/vsergey3d/draw-wxWidgets) repo as exampl
 
 ## Licensing
 
-The library is licensed under the [MIT license](LICENSE.md).
+The library is licensed under the [MIT license](LICENSE).

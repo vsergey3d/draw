@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.3)
 set(DRAW_LIB draw)
 project(${DRAW_LIB} CXX)
 
+set(VERSION_MAJOR   0   CACHE STRING "Project major version number.")
+set(VERSION_MINOR   0   CACHE STRING "Project minor version number.")
+set(VERSION_PATCH   0   CACHE STRING "Project patch version number.")
+mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
+
 add_definitions(-D_UNICODE -DGLEW_STATIC)
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX")
@@ -47,6 +52,34 @@ set(INCLUDE_DIR
 )
 include_directories(${SRC_DIR})
 include_directories(SYSTEM ${INCLUDE_DIR})
+
+find_package(Doxygen REQUIRED)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+    set(DOXYGEN_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+    configure_file(${doxyfile_in} ${DOXYGEN_INPUT} @ONLY)
+
+    add_custom_command(
+        OUTPUT ${DOXYGEN_OUTPUT}
+        COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
+        COMMAND ${CMAKE_COMMAND} -E echo "Done."
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${DOXYGEN_INPUT}
+    )
+
+    add_custom_target(apidoc ALL DEPENDS ${DOXYGEN_OUTPUT})
+
+    add_custom_target(apidoc_forced
+        COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
+        COMMAND ${CMAKE_COMMAND} -E echo "Done."
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+else()
+    message(FATAL_ERROR "doxygen not found")
+endif(DOXYGEN_FOUND)
 
 add_library(${DRAW_LIB} STATIC ${SOURCE_FILES})
 set_target_properties(${DRAW_LIB} PROPERTIES DEBUG_POSTFIX d)
