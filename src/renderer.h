@@ -5,10 +5,6 @@
 #include <vector>
 #include <map>
 
-#if defined(_MSC_VER)
-#pragma warning(disable: 4503)
-#endif
-
 namespace draw {
 
 class Program;
@@ -66,7 +62,3 @@ private:
 };
 
 } // namespace draw
-
-#if defined(_MSC_VER)
-#pragma warning(disable: 4503)
-#endif

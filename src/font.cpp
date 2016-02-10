@@ -2,16 +2,10 @@
 #include <error.h>
 #include <renderer.h>
 #include <algorithm>
-#if defined(_MSC_VER)
-#pragma warning(disable: 4244 4512 4100 4996 4267)
-#endif
 #include <agg_pixfmt_gray.h>
 #include <agg_renderer_scanline.h>
 #include <agg_font_cache_manager.h>
 #include <agg_font_freetype.h>
-#if defined(_MSC_VER)
-#pragma warning(default: 4244 4512 4100 4996 4267)
-#endif
 
 namespace draw {
 
