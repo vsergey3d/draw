@@ -154,7 +154,7 @@ private:
             context.manager.reset_last_glyph();
             auto glyph = context.manager.glyph((uint32_t)*c);
             if (!glyph) {
-                setError(AbsentFontGlyph);
+                setError(IncompleteFontFile);
                 return false;
             }
             const auto& b = glyph->bounds;
@@ -177,6 +177,10 @@ FontImpl::FontImpl(RendererImpl& renderer, const char* filePath, uint32_t letter
 
 bool FontImpl::init() {
 
+    if (letterSize_ < kMinLetterSize) {
+        setError(InvalidArgument);
+        return false;
+    }
     static Generator generator;
     atlas_ = generator.atlas(renderer_, filePath_, letterSize_, letters_);
     return atlas_ != nullptr;

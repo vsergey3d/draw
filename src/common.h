@@ -1,7 +1,25 @@
 #pragma once
-#include <draw.h>
+#include <memory>
+
+#if defined(__clang__)
+#if __has_feature(cxx_noexcept)
+#define HAS_NOEXCEPT
+#endif
+#elif !defined(__clang__) && \
+    defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || \
+    defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026
+#define HAS_NOEXCEPT
+#endif
+#ifdef HAS_NOEXCEPT
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
 
 namespace draw {
+
+class Geometry;
+class Image;
 
 struct Vector4 {
 
@@ -33,10 +51,10 @@ struct Key {
 
     FillMode fillMode {FillMode::Solid};
     uint32_t order {0};
-    GeometryPtr geometry;
-    ImagePtr image;
+    Geometry* geometry;
+    Image* image;
 
-    Key(FillMode fillMode, uint32_t order, GeometryPtr geometry, ImagePtr image) :
+    Key(FillMode fillMode, uint32_t order, Geometry* geometry, Image* image) :
         fillMode(fillMode), order(order), geometry(geometry), image(image) {}
 
     bool operator < (const Key& other) const {
@@ -60,5 +78,10 @@ struct Key {
         return false;
     }
 };
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 } // namespace draw

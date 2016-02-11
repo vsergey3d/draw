@@ -80,10 +80,10 @@ bool ImageImpl::init() {
     return true;
 }
 
-void ImageImpl::upload(Image::Bytes data) {
+void ImageImpl::upload(Image::Bytes bytes) {
 
-    if (!data.data ||
-        data.count != uint32_t(size_.width * size_.height * bpp(format_))) {
+    if (!bytes.ptr ||
+        bytes.count != uint32_t(size_.width * size_.height * bpp(format_))) {
         setError(InvalidArgument);
         return;
     }
@@ -91,7 +91,7 @@ void ImageImpl::upload(Image::Bytes data) {
 
     glBindTexture(GL_TEXTURE_2D, handle_);
     glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat(format_), size_.width,
-        size_.height, 0, glFormat(format_), GL_UNSIGNED_BYTE, data.data);
+        size_.height, 0, glFormat(format_), GL_UNSIGNED_BYTE, bytes.ptr);
 
     ASSERT(glGetError() == GL_NO_ERROR);
 }

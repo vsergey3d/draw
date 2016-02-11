@@ -25,7 +25,7 @@ public:
         case OpenGLOutOfMemory: return "opengl out of memory";
         case InvalidArgument: return "invalid argument";
         case InvalidFontFile: return "invalid font file";
-        case AbsentFontGlyph: return "absent font glyph";
+        case IncompleteFontFile: return "incomplete font file";
         }
         return "";
     }

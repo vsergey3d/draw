@@ -24,7 +24,7 @@ public:
     virtual Format format() const final { return format_; }
     virtual bool filter() const final { return filter_; }
 
-    virtual void upload(Bytes data) final;
+    virtual void upload(Bytes bytes) final;
 
 private:
     RendererImpl& renderer_;

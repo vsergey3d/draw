@@ -438,6 +438,10 @@ ImagePtr RendererImpl::makeImage(const Size& size, Image::Format format, bool fi
 
 FontPtr RendererImpl::makeFont(const char* filePath, uint32_t letterSize) {
 
+    if (!filePath || strlen(filePath) <= 0) {
+        setError(InvalidArgument);
+        return FontPtr();
+    }
     auto ptr = std::make_shared<FontImpl>(*this, filePath, letterSize);
     return ptr->init() ? ptr : FontPtr();
 }
