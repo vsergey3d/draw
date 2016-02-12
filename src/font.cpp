@@ -61,12 +61,13 @@ public:
                     renderer->renderGlyph(*context, glyph, x, y);
                 auto w = (c == kSpaceSymbol ? kSpaceFactor : 1.0f) *
                     std::max(glyph.advance_x, (double)(glyph.bounds.x2 - glyph.bounds.x1));
-                letters[c] = Rect((uint32_t)x, 0, (uint32_t)(x + w), height);
+                letters[c] = Rect((int32_t)x, 0, (int32_t)(x + w), height);
                 x += w + kBorderSize;
             })) {
             return ImagePtr();
         }
-        auto atlas = rendererImpl.makeImage({width, height}, Image::Format::A, true);
+        auto atlas = rendererImpl.makeImage(
+            {(uint32_t)width, (uint32_t)height}, Image::Format::A, true);
         atlas->upload(Image::Bytes(buffer_.data(), buffer_.size()));
         return atlas;
     }

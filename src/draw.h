@@ -70,13 +70,13 @@ bool operator != (const Point& left, const Point& right);
 //! A size in pixel space.
 struct Size {
 
-    int32_t width {1};
-    int32_t height {1};
+    uint32_t width {1};
+    uint32_t height {1};
 
     //! Constructs from unit values.
     Size() = default;
     //! Constructs from parameters.
-    Size(int32_t width, int32_t height) :
+    Size(uint32_t width, uint32_t height) :
         width(width), height(height) {};
 };
 
@@ -206,7 +206,7 @@ class Image {
 
 public:
     //! maximum available size of image's width and height
-    static const int32_t kMaxSize = 4096;
+    static const uint32_t kMaxSize = 4096;
     //! Sequence of bytes.
     using Bytes = Span<uint8_t>;
     //! A pixel format.

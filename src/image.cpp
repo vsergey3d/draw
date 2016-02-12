@@ -24,7 +24,7 @@ inline GLenum glInternalFormat(Image::Format format) {
     return 0;
 }
 
-inline int32_t bpp(Image::Format format) {
+inline uint32_t bpp(Image::Format format) {
 
     switch (format) {
     case Image::Format::A: return 1;

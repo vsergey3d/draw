@@ -372,7 +372,7 @@ uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
     GeometryImpl* lastGeometry = nullptr;
     ImageImpl* lastImage = nullptr;
     Program* lastProgram = nullptr;
-    Vector2 frame(2.0f / std::max(1, screen.width), 2.0f / std::max(1, screen.height));
+    Vector2 frame(2.0f / std::max(1u, screen.width), 2.0f / std::max(1u, screen.height));
     auto total = 0u;
 
     for (auto it = batches_.begin(), end = batches_.end(); it != end; ++it) {
