@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------
+  draw: C++11 cross-platform GPU-accelerated pixel-space 2D drawing library
+  Original location: https://github.com/vsergey3d/draw
+  Distributed under the Simplified BSD License:
+  https://github.com/vsergey3d/draw/LICENCE
+------------------------------------------------------------------------*/
 #pragma once
 #include <memory>
 
@@ -6,7 +12,7 @@
 #define ASSERT(e) assert(e)
 #endif
 
-//#define DRAW_NO_EXCEPTIONS
+#define DRAW_NO_EXCEPTIONS
 #ifndef DRAW_NO_EXCEPTIONS
 #include <exception>
 #endif
@@ -27,7 +33,6 @@ enum ErrorCode {
 #ifndef DRAW_NO_EXCEPTIONS
 
 //! An error exception.
-/*! Available only if DRAW_NO_EXCEPTIONS is not set. */
 class Error : public std::exception {
 
 public:
@@ -150,8 +155,9 @@ struct Span {
 
 //! Set of indexed 2D-primitives.
 /*!
- * You should define your vertices in [0.0, 1.0] space as if it's fit to one pixel.
- * Then you can set appropriate pixel size via Shape::size(const Size& size).
+  You should define your vertices in [0.0, 1.0] space as if it's fit to one pixel.
+  Then you can set appropriate pixel size via Shape::size(const Size& size).
+  To create an object of this type use Renderer::makeGeometry function.
  */
 class Geometry {
 
@@ -195,6 +201,7 @@ public:
 using GeometryPtr = std::shared_ptr<Geometry>;
 
 //! 2D-array of pixels specified format.
+/*! To create an object of this type use Renderer::makeImage function. */
 class Image {
 
 public:
@@ -251,6 +258,7 @@ public:
 using VisualPtr = std::shared_ptr<Visual>;
 
 //! A visual shape.
+/*! To create an object of this type use Renderer::makeShape function. */
 class Shape : public Visual {
 
 public:
@@ -286,6 +294,7 @@ public:
 using ShapePtr = std::shared_ptr<Shape>;
 
 //! Set of characters of the same style and size.
+/*! To create an object of this type use Renderer::makeFont function. */
 class Font {
 
 public:
@@ -302,6 +311,7 @@ public:
 using FontPtr = std::shared_ptr<Font>;
 
 //! A text object.
+/*! To create an object of this type use Renderer::makeText function. */
 class Text : public Visual {
 
 public:
@@ -345,6 +355,7 @@ public:
 using TextPtr = std::shared_ptr<Text>;
 
 //! A factory of all objects and context owner.
+/*! To create an object of this type use draw::makeRenderer function. */
 class Renderer {
 
 public:
@@ -363,6 +374,8 @@ public:
         Geometry::Indices indices, Geometry::Primitive primitive) = 0;
     //! make Image object
     /*!
+      \param size
+      \param format
       \param filter use bilinear filtering or not
       \throw draw::InvalidArgument if size.width is zero or > Image::kMaxSize
       \throw draw::InvalidArgument if size.height is zero or > Image::kMaxSize
