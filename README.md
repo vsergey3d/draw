@@ -20,4 +20,4 @@ See [draw-wxWidgets](https://github.com/vsergey3d/draw-wxWidgets) repo as exampl
 
 ## Licensing
 
-The library is licensed under the [Simplified BSD License](LICENSE).
+The library is licensed under the [Simplified BSD License](https://github.com/vsergey3d/draw/blob/master/LICENSE).
