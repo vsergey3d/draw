@@ -48,7 +48,7 @@ set(INCLUDE_DIR
         ${DEPS_DIR}/freetype2/include
         ${DEPS_DIR}/glew/include
         ${DEPS_DIR}/agg/include
-        {$OPENGL_INCLUDE_DIR}
+        ${OPENGL_INCLUDE_DIR}
 )
 include_directories(${SRC_DIR})
 include_directories(SYSTEM ${INCLUDE_DIR})
