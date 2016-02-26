@@ -8,7 +8,7 @@ C++11 cross-platform GPU-accelerated pixel-space 2D drawing library
 - very fast (using OpenGL instancing under the hood)
 - integer pixel space (resize agnostic)
 - indexed primitives, images, atlases, transparency, z-order
-- text rendering (real-time font atlas generation from TrueType file)
+- text rendering (real-time font atlas generation from FreeType file)
 
 ## How to use
 

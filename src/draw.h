@@ -24,10 +24,10 @@ enum ErrorCode {
 
     NoError = 0, /*!< there are no errors */
     InvalidArgument, /*!< argument is invalid */
-    OpenGLAbsentFeature, /*!< some OpenGL features is not supported by your hardware */
+    OpenGLAbsentFeature, /*!< some OpenGL features are not supported by your hardware */
     OpenGLOutOfMemory, /*!< memory is not enough to create OpenGL resource */
     InvalidFontFile, /*!< a file which contains font glyphs is not found or corrupted */
-    IncompleteFontFile /*!< some alphabet's glyphs is not contained in the font file */
+    IncompleteFontFile /*!< some alphabet's glyphs are not contained in the font file */
 };
 
 #ifndef DRAW_NO_EXCEPTIONS
