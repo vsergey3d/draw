@@ -1,0 +1,10 @@
+CMakeCache.txt
+CMakeFiles
+Makefile
+bin
+*.cmake
+builds/
+build/
+tags
+/cotire/
+*.todo

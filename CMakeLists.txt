@@ -1,36 +1,22 @@
 cmake_minimum_required(VERSION 3.3)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
 set(DRAW_LIB draw)
-project(${DRAW_LIB} CXX)
+set(PROJECT ${DRAW_LIB}_project)
+project(${PROJECT} CXX)
+enable_testing()
 
 set(VERSION_MAJOR   0   CACHE STRING "Project major version number.")
 set(VERSION_MINOR   0   CACHE STRING "Project minor version number.")
 set(VERSION_PATCH   0   CACHE STRING "Project patch version number.")
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
-add_definitions(-D_UNICODE -DGLEW_STATIC -D_CRT_SECURE_NO_WARNINGS)
-if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX  /wd4244 /wd4512 /wd4100 /wd4702")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI /MTd")
-    set(LIB_PATH msvc_lib)    
-	
-elseif(UNIX OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor -Werror")
-
-	set(LIB_PATH unx_lib)
-	if(MINGW)
-		set(LIB_PATH mingw_lib)
-	elseif(APPLE)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -mmacosx-version-min=10.7")
-        set(LIB_PATH osx_lib)
-    endif()
-endif()
-
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(LIB_DIR ${ROOT_DIR}/lib/${LIB_PATH})
 set(SRC_DIR ${ROOT_DIR}/src)
 set(DEPS_DIR ${ROOT_DIR}/deps)
+set(TEST_DIR ${ROOT_DIR}/test)
 set(DRAW_H ${SRC_DIR}/draw.h)
 set(DRAW_INCLUDE ${ROOT_DIR}/include)
 
@@ -42,16 +28,8 @@ set(SOURCE_FILES ${SRC_DIR}/draw.cpp
         ${SRC_DIR}/shape.cpp
         ${SRC_DIR}/text.cpp)
 
-find_library(OPENGL opengl)
-
-set(INCLUDE_DIR
-        ${DEPS_DIR}/freetype2/include
-        ${DEPS_DIR}/glew/include
-        ${DEPS_DIR}/agg/include
-        ${OPENGL_INCLUDE_DIR}
-)
-include_directories(${SRC_DIR})
-include_directories(SYSTEM ${INCLUDE_DIR})
+set(TEST_FILES
+        ${TEST_DIR}/drawTest.cpp)
 
 find_package(Doxygen REQUIRED)
 if(DOXYGEN_FOUND)
@@ -81,11 +59,5 @@ else()
     message(FATAL_ERROR "doxygen not found")
 endif(DOXYGEN_FOUND)
 
-add_library(${DRAW_LIB} STATIC ${SOURCE_FILES})
-set_target_properties(${DRAW_LIB} PROPERTIES DEBUG_POSTFIX d)
-
-file(COPY ${DRAW_H} DESTINATION ${DRAW_INCLUDE})
-
-install(TARGETS ${DRAW_LIB} DESTINATION ${LIB_DIR})
-install(FILES ${DRAW_H} DESTINATION ${DRAW_INCLUDE})
-
+add_subdirectory(${SRC_DIR} ${CMAKE_BINARY_DIR}/${DRAW_LIB})
+add_subdirectory(${TEST_DIR} ${CMAKE_BINARY_DIR}/${DRAW_LIB}_test)

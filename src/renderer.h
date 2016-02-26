@@ -1,7 +1,7 @@
 #pragma once
 #include <draw.h>
 #include <common.h>
-#include <GL/glew.h>
+#include <opengl.h>
 #include <vector>
 #include <map>
 
