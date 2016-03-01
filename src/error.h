@@ -30,7 +30,7 @@ public:
         return "";
     }
 private:
-    ErrorCode code_;
+    ErrorCode code_ {NoError};
 };
 
 inline void setError(ErrorCode code) {
@@ -42,7 +42,12 @@ inline void setError(ErrorCode code) {
 #else
 
 static ErrorCode gLastError = NoError;
-inline ErrorCode getLastError() { return gLastError; }
+inline ErrorCode getLastError() {
+
+    auto error = gLastError;
+    gLastError = NoError;
+    return error;
+}
 
 inline void setError(ErrorCode code) {
 

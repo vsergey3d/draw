@@ -2,7 +2,7 @@
   draw: C++11 cross-platform GPU-accelerated pixel-space 2D drawing library
   Original location: https://github.com/vsergey3d/draw
   Distributed under the Simplified BSD License:
-  https://github.com/vsergey3d/draw/LICENCE
+  https://github.com/vsergey3d/draw/blob/master/LICENSE
 ------------------------------------------------------------------------*/
 #pragma once
 #include <memory>
@@ -36,14 +36,14 @@ enum ErrorCode {
 class Error : public std::exception {
 
 public:
-    virtual ~Error() = 0;
+    virtual ~Error() = default;
 
     //! return error code
     virtual ErrorCode code() const = 0;
 };
 
 #else
-//! return last error
+//! return last error and set the value to draw::NoError
 ErrorCode getLastError();
 #endif
 
@@ -189,7 +189,7 @@ public:
         Line, /*!< consumes 2 index per primitive */
         Triangle /*!< consumes 3 index per primitive */
     };
-    virtual ~Geometry() = 0;
+    virtual ~Geometry() = default;
     //! return vertex count
     virtual uint32_t vertexCount() const = 0;
     //! return index count
@@ -202,6 +202,12 @@ using GeometryPtr = std::shared_ptr<Geometry>;
 
 //! 2D-array of pixels specified format.
 /*! To create an object of this type use Renderer::makeImage function. */
+#ifdef DRAW_NO_EXCEPTIONS
+/*!
+  NOTE: exceptions are disabled. 'Exceptions' section lists expected errors
+  which you can check via draw::getLastError.
+*/
+#endif
 class Image {
 
 public:
@@ -216,7 +222,7 @@ public:
         RGB, /*!< 3 bytes per pixel (1-red, 1-green, 1-blue) */
         RGBA /*!< 4 bytes per pixel (1-red, 1-green, 1-blue, 1-alpha) */
     };
-    virtual ~Image() = 0;
+    virtual ~Image() = default;
 
     //! return size
     virtual const Size& size() const = 0;
@@ -238,7 +244,7 @@ using ImagePtr = std::shared_ptr<Image>;
 class Visual {
 
 public:
-    virtual ~Visual() = 0;
+    virtual ~Visual() = default;
     //! enable/disable visibility
     virtual void visibility(bool enable) = 0;
     //! check if visibility is enabled or not
@@ -262,7 +268,7 @@ using VisualPtr = std::shared_ptr<Visual>;
 class Shape : public Visual {
 
 public:
-    virtual ~Shape() = 0;
+    virtual ~Shape() = default;
     //! set size
     virtual void size(const Size& size) = 0;
     //! return size
@@ -301,7 +307,7 @@ public:
     //! minimum available letter size
     static const uint32_t kMinLetterSize = 5;
 
-    virtual ~Font() = 0;
+    virtual ~Font() = default;
     //! return file path
     virtual const char* filePath() const = 0;
     //! return letter size
@@ -315,7 +321,7 @@ using FontPtr = std::shared_ptr<Font>;
 class Text : public Visual {
 
 public:
-    virtual ~Text() = 0;
+    virtual ~Text() = default;
     //! set Font object
     virtual void font(FontPtr font) = 0;
     //! return Font object
@@ -354,14 +360,20 @@ public:
 
 using TextPtr = std::shared_ptr<Text>;
 
-//! A factory of all objects and context owner.
+//! A factory and context owner.
 /*! To create an object of this type use draw::makeRenderer function. */
+#ifdef DRAW_NO_EXCEPTIONS
+/*!
+  NOTE: exceptions are disabled. 'Exceptions' section lists expected errors
+  which you can obtain via draw::getLastError.
+*/
+#endif
 class Renderer {
 
 public:
     //! destruct renderer and owned context
     /*! Note: all created objects must be destroyed before the renderer object */
-    virtual ~Renderer() = 0;
+    virtual ~Renderer() = default;
     //! make Geometry object
     /*!
       \throw draw::InvalidArgument if vertices.data is invalid
@@ -424,7 +436,7 @@ using RendererPtr = std::shared_ptr<Renderer>;
 class Context {
 
 public:
-    virtual ~Context() = 0;
+    virtual ~Context() = default;
     //! set context as current
     virtual void setCurrent() = 0;
 };
@@ -432,9 +444,15 @@ public:
 using ContextPtr = std::unique_ptr<Context>;
 
 //! make Renderer object
+#ifdef DRAW_NO_EXCEPTIONS
 /*!
-  \param context (it's recommended to move ownership of the context immediately to the parameter:
-  makeRenderer(std::move(make_unique<ContextImpl>())))
+  NOTE: exceptions are disabled. 'Exceptions' section lists expected errors
+  which you can obtain via draw::getLastError.
+*/
+#endif
+/*!
+  \param context It's recommended to move ownership of the context immediately to
+  the renderer: makeRenderer(std::move(make_unique<ContextImpl>())).
   \throw draw::InvalidArgument if context is invalid
   \throw draw::OpenGLAbsentFeature if OpenGL 2.0 or ARB_draw_instanced are not supported
   \throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources

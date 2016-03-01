@@ -33,23 +33,4 @@ bool operator != (const Rect& left, const Rect& right) {
     return !(left == right);
 }
 
-#ifndef DRAW_NO_EXCEPTIONS
-Error::~Error() {}
-#endif
-Geometry::~Geometry() {}
-
-Image::~Image() {}
-
-Visual::~Visual() {}
-
-Shape::~Shape() {}
-
-Font::~Font() {}
-
-Text::~Text() {}
-
-Renderer::~Renderer() {}
-
-Context::~Context() {}
-
 } // namespace draw
