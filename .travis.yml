@@ -5,8 +5,8 @@ compiler:
   - clang
   
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake
+  - sudo apt-get update -qq -y
+  - sudo apt-get install -qq cmake doxygen
   
 before_script:
   - mkdir build
