@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 2.8)
 project(${DRAW_LIB} CXX)
 
 add_definitions(-D_UNICODE -DGLEW_STATIC -D_CRT_SECURE_NO_WARNINGS)
