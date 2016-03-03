@@ -1,4 +1,4 @@
-# draw
+# draw&nbsp;&nbsp;[![Build Status](https://travis-ci.org/vsergey3d/draw.svg?branch=master)](https://travis-ci.org/vsergey3d/draw)
 
 C++11 cross-platform GPU-accelerated pixel-space 2D drawing library
 
