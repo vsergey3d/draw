@@ -30,9 +30,9 @@ public:
     virtual uint32_t letterSize() const final { return letterSize_; }
 
 private:
-	RendererImpl& renderer_;
+    RendererImpl& renderer_;
 	std::string filePath_;
-    uint32_t letterSize_ {0};
+	uint32_t letterSize_ {0};
 	Letters letters_;
 	ImagePtr atlas_;
 };

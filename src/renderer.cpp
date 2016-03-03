@@ -56,48 +56,8 @@ public:
         GLuint screenFrame {0};
     };
 
-    Program(RendererImpl& renderer, const char* vs, const char* fs):
-        renderer_(renderer) {
-
-        renderer_.setContext();
-
-        GLint length = strlen(vs);
-        vs_ = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs_, 1, &vs, &length);
-        glCompileShader(vs_);
-        ASSERT(checkShader(vs_));
-
-        length = strlen(fs);
-        fs_ = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs_, 1, &fs, &length);
-        glCompileShader(fs_);
-        ASSERT(checkShader(fs_));
-
-        handle_ = glCreateProgram();
-        glAttachShader(handle_, vs_);
-        glAttachShader(handle_, fs_);
-        glLinkProgram(handle_);
-        ASSERT(checkProgram(handle_));
-
-        attributes_.pos = getAttribLocation(handle_, "pos");
-        attributes_.uv = getAttribLocation(handle_, "uv");
-        attributes_.posFrame = getAttribLocation(handle_, "posFrame");
-        attributes_.uvFrame = getAttribLocation(handle_, "uvFrame");
-        attributes_.color = getAttribLocation(handle_, "color");
-        uniforms_.screenFrame = getUniformLocation(handle_, "screenFrame");
-        uniforms_.image = getUniformLocation(handle_, "image");
-
-        ASSERT(glGetError() == GL_NO_ERROR);
-    }
-
-    ~Program() {
-
-        renderer_.setContext();
-
-        glDeleteShader(vs_);
-        glDeleteShader(fs_);
-        glDeleteProgram(handle_);
-    }
+    Program(RendererImpl& renderer, const char* vs, const char* fs);
+    ~Program();
 
     Program(const Program&) = delete;
     Program& operator = (const Program&) = delete;
@@ -114,6 +74,49 @@ private:
     GLuint fs_ {0};
     GLuint handle_ {0};
 };
+
+Program::Program(RendererImpl& renderer, const char* vs, const char* fs):
+    renderer_(renderer) {
+
+    renderer_.setContext();
+
+    GLint length = strlen(vs);
+    vs_ = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vs_, 1, &vs, &length);
+    glCompileShader(vs_);
+    ASSERT(checkShader(vs_));
+
+    length = strlen(fs);
+    fs_ = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs_, 1, &fs, &length);
+    glCompileShader(fs_);
+    ASSERT(checkShader(fs_));
+
+    handle_ = glCreateProgram();
+    glAttachShader(handle_, vs_);
+    glAttachShader(handle_, fs_);
+    glLinkProgram(handle_);
+    ASSERT(checkProgram(handle_));
+
+    attributes_.pos = getAttribLocation(handle_, "pos");
+    attributes_.uv = getAttribLocation(handle_, "uv");
+    attributes_.posFrame = getAttribLocation(handle_, "posFrame");
+    attributes_.uvFrame = getAttribLocation(handle_, "uvFrame");
+    attributes_.color = getAttribLocation(handle_, "color");
+    uniforms_.screenFrame = getUniformLocation(handle_, "screenFrame");
+    uniforms_.image = getUniformLocation(handle_, "image");
+
+    ASSERT(glGetError() == GL_NO_ERROR);
+}
+
+Program::~Program() {
+
+    renderer_.setContext();
+
+    glDeleteShader(vs_);
+    glDeleteShader(fs_);
+    glDeleteProgram(handle_);
+}
 
 inline uint32_t typeByteSize(GLenum type) {
 
@@ -375,8 +378,8 @@ uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
     Vector2 frame(2.0f / std::max(1u, screen.width), 2.0f / std::max(1u, screen.height));
     auto total = 0u;
 
-    for (auto it = batches_.begin(), end = batches_.end(); it != end; ++it) {
-        const auto& key = it->first;
+    for (const auto& pair : batches_) {
+        const auto& key = pair.first;
         setupFillMode(key.fillMode);
 
         auto* program = getProgram(key.fillMode);
@@ -395,7 +398,7 @@ uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
                 bindGeometry(program, geometry);
                 lastGeometry = geometry;
             }
-            auto count = bindBatch(program, it->second);
+            auto count = bindBatch(program, pair.second);
             glDrawElementsInstanced(glPrimitive(geometry->primitive()),
                 geometry->indexCount(), GL_UNSIGNED_SHORT, 0, count);
             total += count;
