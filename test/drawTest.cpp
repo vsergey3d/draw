@@ -10,28 +10,191 @@ using namespace bandit;
 
 go_bandit([](){
 
-    describe("point:", [](){
+    describe("draw::Point", [](){
 
         draw::Point point;
         draw::Point point1 {2, 3};
         draw::Point point2 {2, 3};
 
-        it("should be zero by default", [&](){
+        it("should be zero by default", [&]{
 
             AssertThat(point.x, Equals(0));
             AssertThat(point.y, Equals(0));
         });
 
-        describe("equal op", [&](){
+        it("should be constructed from params", [&]{
 
-            it("should return true if points are equal", [&](){
+            AssertThat(point1.x, Equals(2));
+            AssertThat(point1.y, Equals(3));
+        });
 
-                AssertThat(point1, Is().EqualTo(point2));
+        describe("equal operators", [&]{
+
+            describe("equal to", [&]{
+
+                it("should return true if points are equal", [&]{
+
+                    AssertThat(point1 == point2, Is().True());
+                });
+
+                it("should return false if points are not equal", [&]{
+
+                    AssertThat(point == point2, Is().False());
+                });
             });
-            it("should return false if points are not equal", [&](){
 
-                AssertThat(point1, Is().Not().EqualTo(point));
+            describe("not equal to", [&]{
+
+                it("should return true if points are not equal", [&]{
+
+                    AssertThat(point != point1, Is().True());
+                });
+
+                it("should return false if points are equal", [&]{
+
+                    AssertThat(point1 != point2, Is().False());
+                });
             });
+        });
+    });
+
+    describe("draw::Size", [](){
+
+        draw::Size size;
+        draw::Size size1 {12, 88};
+        draw::Size size2 {12, 88};
+
+        it("should be constucted by default", [&]{
+
+            AssertThat(size.width, Equals(1));
+            AssertThat(size.height, Equals(1));
+        });
+
+        it("should be constructed from params", [&]{
+
+            AssertThat(size1.width,  Equals(12));
+            AssertThat(size1.height, Equals(88));
+        });
+
+        describe("equal operators", [&]{
+
+            describe("equal to", [&]{
+
+                it("should return true if sizes are equal", [&]{
+
+                    AssertThat(size1 == size2, Is().True());
+                });
+
+                it("should return false if sizes are not equal", [&]{
+
+                    AssertThat(size == size2, Is().False());
+                });
+            });
+
+            describe("not equal to", [&]{
+
+                it("should return true if sizes are not equal", [&]{
+
+                    AssertThat(size != size1, Is().True());
+                });
+
+                it("should return false if sizes are equal", [&]{
+
+                    AssertThat(size1 != size2, Is().False());
+                });
+            });
+        });
+    });
+
+    describe("draw::Rect", [](){
+
+        draw::Rect rect;
+        draw::Rect rect1 {9, -10, 33, 77};
+        draw::Rect rect2 {9, -10, 33, 77};
+
+        it("should be zero by default", [&]{
+
+            AssertThat(rect.left, Equals(0));
+            AssertThat(rect.bottom, Equals(0));
+            AssertThat(rect.right, Equals(0));
+            AssertThat(rect.top, Equals(0));
+        });
+
+        it("should be constructed from params", [&]{
+
+            AssertThat(rect1.left, Equals(9));
+            AssertThat(rect1.bottom, Equals(-10));
+            AssertThat(rect1.right, Equals(33));
+            AssertThat(rect1.top, Equals(77));
+        });
+
+        describe("equal operators", [&]{
+
+            describe("equal to", [&]{
+
+                it("should return true if rects are equal", [&]{
+
+                    AssertThat(rect1 == rect2, Is().True());
+                });
+
+                it("should return false if rects are not equal", [&]{
+
+                    AssertThat(rect == rect2, Is().False());
+                });
+            });
+
+            describe("not equal to", [&]{
+
+                it("should return true if rects are not equal", [&]{
+
+                    AssertThat(rect != rect1, Is().True());
+                });
+
+                it("should return false if rects are equal", [&]{
+
+                    AssertThat(rect1 != rect2, Is().False());
+                });
+            });
+        });
+    });
+
+    describe("draw::Vector2", [](){
+
+        draw::Vector2 vector;
+        draw::Vector2 vector1 {5.2, 6.3};
+
+        it("should be zero by default", [&]{
+
+            AssertThat(vector.x, Is().EqualToWithDelta(0.0f, 0.01f));
+            AssertThat(vector.y, Is().EqualToWithDelta(0.0f, 0.01f));
+        });
+
+        it("should be constructed from params", [&]{
+
+            AssertThat(vector1.x, Is().EqualToWithDelta(5.2f, 0.01f));
+            AssertThat(vector1.y, Is().EqualToWithDelta(6.3f, 0.01f));
+        });
+    });
+
+    describe("draw::Color", [](){
+
+        draw::Color color;
+        draw::Color color1 {0.5,0.77, 1.0, 0.23};
+
+        it("should be {0,0,0,1} by default", [&]{
+
+            AssertThat(color.r, Is().EqualToWithDelta(0.0f, 0.01f));
+            AssertThat(color.g, Is().EqualToWithDelta(0.0f, 0.01f));
+            AssertThat(color.b, Is().EqualToWithDelta(0.0f, 0.01f));
+            AssertThat(color.a, Is().EqualToWithDelta(1.0f, 0.01f));
+        });
+
+        it("should be constructed from params", [&]{
+
+            AssertThat(color1.r, Is().EqualToWithDelta(0.5f, 0.01f));
+            AssertThat(color1.g, Is().EqualToWithDelta(0.77f, 0.01f));
+            AssertThat(color1.b, Is().EqualToWithDelta(1.0f, 0.01f));
+            AssertThat(color1.a, Is().EqualToWithDelta(0.23f, 0.01f));
         });
     });
 
@@ -44,14 +207,13 @@ go_bandit([](){
             virtual void setCurrent() override {};
         };
 
-        it("should create renderer", [&](){
+        using ::testing::Return;
+        using ::testing::SetArgPointee;
+        using ::testing::_;
 
-            using ::testing::Return;
-            using ::testing::SetArgPointee;
-            using ::testing::_;
+        before_each([&]{
 
             Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_OK));
-            Verify(::glMocked(), glew_Init()).Times(1);
             Given(::glMocked(), glew_IsSupported(_)).WillByDefault(Return(true));
             Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_NO_ERROR));
             Given(::glMocked(), gl_CreateShader(_)).WillByDefault(Return(1));
@@ -60,12 +222,60 @@ go_bandit([](){
             Given(::glMocked(), gl_GetProgramiv(_, _, _)).WillByDefault(SetArgPointee<2>(GL_TRUE));
             Given(::glMocked(), gl_GetAttribLocation(_, _)).WillByDefault(Return(1));
             Given(::glMocked(), gl_GetUniformLocation(_, _)).WillByDefault(Return(1));
+        });
+
+        it("should be created", [&]{
+
+            //Verify(::glMocked(), glew_Init()).Times(1);
 
             auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
             AssertThat(r, Is().Not().EqualTo(draw::RendererPtr()));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
         });
-    });
 
+        it("should throw draw::InvalidArgument if context is invalid", [&]{
+
+            auto r = draw::makeRenderer(nullptr);
+            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::InvalidArgument));
+        });
+
+        it("throw draw::OpenGLAbsentFeature if OpenGL 2.0 is not supported", [&]{
+
+            Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_ERROR_NO_GL_VERSION));
+
+            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
+        });
+
+        it("throw draw::OpenGLAbsentFeature if ARB_draw_instanced is not supported", [&]{
+
+            Given(::glMocked(), glew_IsSupported(_)).WillByDefault(Return(false));
+
+            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
+        });
+
+        it("throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources", [&]{
+
+            Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_OUT_OF_MEMORY));
+
+            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLOutOfMemory));
+        });
+/*
+        it("should draw no objects", [&]{
+
+            draw::Size size;
+            draw::Color color;
+
+            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(r->draw(size, color), Is().EqualTo(0));
+            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
+        });*/
+    });
 });
 
 int main(int argc, char* argv[]) {

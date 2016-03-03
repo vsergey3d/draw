@@ -54,7 +54,7 @@ private:
     static const uint32_t kDataGrowthFactor {2};
     std::vector<Instance> dataBuffer_;
     GLuint glBuffer_ {0};
-    void resizeDataBuffer(uint32_t size);
+    bool resizeDataBuffer(uint32_t size);
 
     ProgramPtr geometryProgram_;
     ProgramPtr fontProgram_;

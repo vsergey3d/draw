@@ -190,10 +190,6 @@ RendererImpl::~RendererImpl() {
 
 bool RendererImpl::init() {
 
-    if (!context_) {
-        setError(InvalidArgument);
-        return false;
-    }
     setContext();
     if (glewInit() != GLEW_OK ||
         !glewIsSupported("GL_VERSION_2_0  GL_ARB_draw_instanced")) {
@@ -204,7 +200,9 @@ bool RendererImpl::init() {
     glDisable(GL_STENCIL_TEST);
 
     glGenBuffers(1, &glBuffer_);
-    resizeDataBuffer(kDataInitCapacity);
+    if (!resizeDataBuffer(kDataInitCapacity)) {
+        return false;
+    };
 
     static const Geometry::Vertex kQuadVertices[] = {
         {{0.0f, 0.0f}, {0.0f, 0.0f}},
@@ -234,19 +232,20 @@ bool RendererImpl::init() {
     return true;
 }
 
-void RendererImpl::resizeDataBuffer(uint32_t size) {
+bool RendererImpl::resizeDataBuffer(uint32_t size) {
 
     setContext();
 
     glBindBuffer(GL_ARRAY_BUFFER, glBuffer_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Instance) * size, nullptr, GL_DYNAMIC_DRAW);
-    ASSERT(glGetError() == GL_NO_ERROR);
 
     if (glGetError() == GL_OUT_OF_MEMORY) {
         setError(OpenGLOutOfMemory);
-        return;
+        return false;
     }
+    ASSERT(glGetError() == GL_NO_ERROR);
     dataBuffer_.resize(size);
+    return true;
 }
 
 Instance* RendererImpl::add(const Key& key) {
@@ -475,6 +474,10 @@ TextPtr RendererImpl::makeText() {
 
 RendererPtr makeRenderer(ContextPtr context) {
 
+    if (!context) {
+        setError(InvalidArgument);
+        return RendererPtr();
+    }
     auto ptr = std::make_shared<RendererImpl>(std::move(context));
     return ptr->init() ? ptr : RendererPtr();
 }

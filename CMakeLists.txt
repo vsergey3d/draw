@@ -21,6 +21,7 @@ set(DRAW_H ${SRC_DIR}/draw.h)
 set(DRAW_INCLUDE ${ROOT_DIR}/include)
 
 set(SOURCE_FILES ${SRC_DIR}/draw.cpp
+        ${SRC_DIR}/error.cpp
         ${SRC_DIR}/image.cpp
         ${SRC_DIR}/geometry.cpp
         ${SRC_DIR}/font.cpp
