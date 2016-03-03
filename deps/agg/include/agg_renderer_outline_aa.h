@@ -1834,7 +1834,7 @@ namespace agg
 
     private:
         base_ren_type*         m_ren;
-        const line_profile_aa* m_profile; 
+        line_profile_aa*       m_profile; 
         color_type             m_color;
         rect_i                 m_clip_box;
         bool                   m_clipping;
