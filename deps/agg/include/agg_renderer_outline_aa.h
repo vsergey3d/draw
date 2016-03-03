@@ -1360,7 +1360,7 @@ namespace agg
         typedef typename base_ren_type::color_type color_type;
 
         //---------------------------------------------------------------------
-        renderer_outline_aa(base_ren_type& ren, const line_profile_aa& prof) :
+        renderer_outline_aa(base_ren_type& ren, line_profile_aa& prof) :
             m_ren(&ren),
             m_profile(&prof),
             m_clip_box(0,0,0,0),
