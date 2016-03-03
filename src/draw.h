@@ -5,6 +5,7 @@
   https://github.com/vsergey3d/draw/blob/master/LICENSE
 ------------------------------------------------------------------------*/
 #pragma once
+#include <stdint.h>
 #include <memory>
 
 #ifndef ASSERT
