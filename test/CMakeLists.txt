@@ -28,3 +28,6 @@ endif()
 
 add_gmock_test(${PROJECT} ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(${PROJECT} ${LIBS})
+
+find_package(codecov)
+add_coverage(${PROJECT})

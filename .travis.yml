@@ -17,14 +17,18 @@ matrix:
 
 before_install:
   - sudo apt-get update -qq -y
-  - sudo apt-get install -qq cmake doxygen
+  - sudo apt-get install -qq cmake doxygen lcov
   
 before_script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+  - cmake -DENABLE_COVERAGE=On -DCMAKE_CXX_COMPILER=$COMPILER ..
 
-script: make -j4
+script:
+  - make -j4
+  - make test
+  - make gcov
+  - make lcov
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -X gcov
