@@ -26,14 +26,14 @@ public:
     virtual void transparency(bool value) final;
     virtual bool transparency() const final { return fillMode_ == FillMode::Transparent; }
 
-    virtual void geometry(GeometryPtr geometry) final;
+    virtual void geometry(const GeometryPtr& geometry) final;
     virtual GeometryPtr geometry() const final { return geometry_; }
 
-    virtual void image(ImagePtr image) final;
-    virtual void image(ImagePtr image, const Vector2& tile) final;
+    virtual void image(const ImagePtr& image) final;
+    virtual void image(const ImagePtr& image, const Vector2& tile) final;
     virtual ImagePtr image() const final { return image_; }
 
-    virtual void image(ImagePtr atlas, const Rect& element) final;
+    virtual void image(const ImagePtr& atlas, const Rect& element) final;
     virtual ImagePtr image(Rect& element) const final;
 
     // Visual
@@ -53,7 +53,7 @@ private:
     void addInstance();
     void removeInstance();
 
-    void image(ImagePtr atlas, const Rect& element, const Vector2& tile);
+    void image(const ImagePtr& atlas, const Rect& element, const Vector2& tile);
 
     RendererImpl& renderer_;
     Instance* instance_ {nullptr};

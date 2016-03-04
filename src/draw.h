@@ -18,6 +18,11 @@
 #include <exception>
 #endif
 
+#ifndef SHARED_PTR
+#define SHARED_PTR std::shared_ptr
+#define MAKE_SHARED_PTR std::make_shared
+#endif
+
 namespace draw {
 
 //! An error code which library can generate.
@@ -199,7 +204,7 @@ public:
     virtual Primitive primitive() const = 0;
 };
 
-using GeometryPtr = std::shared_ptr<Geometry>;
+using GeometryPtr = SHARED_PTR<Geometry>;
 
 //! 2D-array of pixels specified format.
 /*! To create an object of this type use Renderer::makeImage function. */
@@ -239,7 +244,7 @@ public:
     virtual void upload(Bytes bytes) = 0;
 };
 
-using ImagePtr = std::shared_ptr<Image>;
+using ImagePtr = SHARED_PTR<Image>;
 
 //! Base interface class of any visual object.
 class Visual {
@@ -262,7 +267,7 @@ public:
     virtual const Rect& bounds() const = 0;
 };
 
-using VisualPtr = std::shared_ptr<Visual>;
+using VisualPtr = SHARED_PTR<Visual>;
 
 //! A visual shape.
 /*! To create an object of this type use Renderer::makeShape function. */
@@ -283,22 +288,22 @@ public:
     //! check if transparency is enabled or not
     virtual bool transparency() const = 0;
     //! set geometry
-    virtual void geometry(GeometryPtr geometry) = 0;
+    virtual void geometry(const GeometryPtr& geometry) = 0;
     //! return geometry
     virtual GeometryPtr geometry() const = 0;
     //! set image
-    virtual void image(ImagePtr image) = 0;
+    virtual void image(const ImagePtr& image) = 0;
     //! set image with tile factor (repetition count)
-    virtual void image(ImagePtr image, const Vector2& tile) = 0;
+    virtual void image(const ImagePtr& image, const Vector2& tile) = 0;
     //! return image
     virtual ImagePtr image() const = 0;
     //! set a rectangular element of image atlas
-    virtual void image(ImagePtr atlas, const Rect& element) = 0;
+    virtual void image(const ImagePtr& atlas, const Rect& element) = 0;
     //! return image atlas and rectangular part of it
     virtual ImagePtr image(Rect& element) const = 0;
 };
 
-using ShapePtr = std::shared_ptr<Shape>;
+using ShapePtr = SHARED_PTR<Shape>;
 
 //! Set of characters of the same style and size.
 /*! To create an object of this type use Renderer::makeFont function. */
@@ -315,7 +320,7 @@ public:
     virtual uint32_t letterSize() const = 0;
 };
 
-using FontPtr = std::shared_ptr<Font>;
+using FontPtr = SHARED_PTR<Font>;
 
 //! A text object.
 /*! To create an object of this type use Renderer::makeText function. */
@@ -324,7 +329,7 @@ class Text : public Visual {
 public:
     virtual ~Text() = default;
     //! set Font object
-    virtual void font(FontPtr font) = 0;
+    virtual void font(const FontPtr& font) = 0;
     //! return Font object
     virtual FontPtr font() const = 0;
     //! set text string
@@ -359,7 +364,7 @@ public:
     virtual VertAlign vertAlign() const = 0;
 };
 
-using TextPtr = std::shared_ptr<Text>;
+using TextPtr = SHARED_PTR<Text>;
 
 //! A factory and context owner.
 /*! To create an object of this type use draw::makeRenderer function. */
@@ -423,10 +428,12 @@ public:
     /*!
       \return drawn objects count
     */
-    virtual uint32_t draw(const Size& screen, const Color& clear) = 0;
+    virtual uint32_t draw(const Color& clear) = 0;
+    //! set a new screen size
+    virtual void resize(const Size& size) = 0;
 };
 
-using RendererPtr = std::shared_ptr<Renderer>;
+using RendererPtr = SHARED_PTR<Renderer>;
 
 //! OpenGL rendering context base interface class.
 /*!

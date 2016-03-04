@@ -3,7 +3,7 @@
 
 namespace draw {
 
-inline void uvFrame(ImagePtr atlas, const Rect& rect,
+inline void uvFrame(const ImagePtr& atlas, const Rect& rect,
     const Vector2& tile, Vector4& frame) {
 
     if (!atlas) {
@@ -126,7 +126,7 @@ void ShapeImpl::transparency(bool value) {
     }
 }
 
-void ShapeImpl::geometry(GeometryPtr geometry) {
+void ShapeImpl::geometry(const GeometryPtr& geometry) {
 
     if (geometry_ != geometry) {
         if (visibility_) removeInstance();
@@ -135,7 +135,7 @@ void ShapeImpl::geometry(GeometryPtr geometry) {
     }
 }
 
-void ShapeImpl::image(ImagePtr atlas, const Rect& element, const Vector2& tile) {
+void ShapeImpl::image(const ImagePtr& atlas, const Rect& element, const Vector2& tile) {
 
     element_ = element;
     tile_ = tile;
@@ -152,17 +152,17 @@ void ShapeImpl::image(ImagePtr atlas, const Rect& element, const Vector2& tile) 
 
 static const Vector2 kNoTile(1.0f, 1.0f);
 
-void ShapeImpl::image(ImagePtr atlas, const Rect& element) {
+void ShapeImpl::image(const ImagePtr& atlas, const Rect& element) {
 
     image(atlas, element, kNoTile);
 }
 
-void ShapeImpl::image(ImagePtr image) {
+void ShapeImpl::image(const ImagePtr& image) {
 
     ShapeImpl::image(image, kNoTile);
 }
 
-void ShapeImpl::image(ImagePtr image, const Vector2& tile) {
+void ShapeImpl::image(const ImagePtr& image, const Vector2& tile) {
 
     element_.left = 0;
     element_.bottom = 0;

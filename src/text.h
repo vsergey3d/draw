@@ -19,7 +19,7 @@ public:
 
     // Text
 
-    virtual void font(FontPtr font) final;
+    virtual void font(const FontPtr& font) final;
     virtual FontPtr font() const final { return font_; }
 
     virtual void text(const wchar_t* text) final;

@@ -129,7 +129,7 @@ void TextImpl::align() {
     }
 }
 
-void TextImpl::font(FontPtr font) {
+void TextImpl::font(const FontPtr& font) {
 
     if (font_ != font) {
         font_ = font;

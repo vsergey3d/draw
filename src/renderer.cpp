@@ -366,15 +366,15 @@ inline void setupScreen(const Size& screen, const Color& clear) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
+uint32_t RendererImpl::draw(const Color& clear) {
 
     setContext();
-    setupScreen(screen, clear);
+    setupScreen(size_, clear);
 
     GeometryImpl* lastGeometry = nullptr;
     ImageImpl* lastImage = nullptr;
     Program* lastProgram = nullptr;
-    Vector2 frame(2.0f / std::max(1u, screen.width), 2.0f / std::max(1u, screen.height));
+    Vector2 frame(2.0f / size_.width, 2.0f / size_.height);
     auto total = 0u;
 
     for (const auto& pair : batches_) {
@@ -407,6 +407,12 @@ uint32_t RendererImpl::draw(const Size& screen, const Color& clear) {
     return total;
 }
 
+void RendererImpl::resize(const Size& size) {
+
+    size_.width  = std::max(1u, size.width);
+    size_.height  = std::max(1u, size.height);
+}
+
 uint32_t RendererImpl::bindBatch(Program* program, const Batch& batch) {
 
     auto count = 0u;
@@ -428,13 +434,13 @@ uint32_t RendererImpl::bindBatch(Program* program, const Batch& batch) {
 GeometryPtr RendererImpl::makeGeometry(Geometry::Vertices vertices,
     Geometry::Indices indices, Geometry::Primitive primitive) {
 
-    auto ptr = std::make_shared<GeometryImpl>(*this, vertices, indices, primitive);
+    auto ptr = MAKE_SHARED_PTR<GeometryImpl>(*this, vertices, indices, primitive);
     return ptr->init() ? ptr : GeometryPtr();
 }
 
 ImagePtr RendererImpl::makeImage(const Size& size, Image::Format format, bool filter) {
 
-    auto ptr = std::make_shared<ImageImpl>(*this, size, format, filter);
+    auto ptr = MAKE_SHARED_PTR<ImageImpl>(*this, size, format, filter);
     return ptr->init() ? ptr : ImagePtr();
 }
 
@@ -444,32 +450,32 @@ FontPtr RendererImpl::makeFont(const char* filePath, uint32_t letterSize) {
         setError(InvalidArgument);
         return FontPtr();
     }
-    auto ptr = std::make_shared<FontImpl>(*this, filePath, letterSize);
+    auto ptr = MAKE_SHARED_PTR<FontImpl>(*this, filePath, letterSize);
     return ptr->init() ? ptr : FontPtr();
 }
 
 ShapePtr RendererImpl::makeFontRect() {
 
-    auto ptr = std::make_shared<ShapeImpl>(*this, FillMode::Font);
+    auto ptr = MAKE_SHARED_PTR<ShapeImpl>(*this, FillMode::Font);
     ptr->geometry(rectGeometry_);
     return ptr;
 }
 
 ShapePtr RendererImpl::makeRect() {
 
-    auto ptr = std::make_shared<ShapeImpl>(*this);
+    auto ptr = MAKE_SHARED_PTR<ShapeImpl>(*this);
     ptr->geometry(rectGeometry_);
     return ptr;
 }
 
 ShapePtr RendererImpl::makeShape() {
 
-    return std::make_shared<ShapeImpl>(*this);
+    return MAKE_SHARED_PTR<ShapeImpl>(*this);
 }
 
 TextPtr RendererImpl::makeText() {
 
-    return std::make_shared<TextImpl>(*this);
+    return MAKE_SHARED_PTR<TextImpl>(*this);
 }
 
 RendererPtr makeRenderer(ContextPtr context) {
@@ -478,7 +484,7 @@ RendererPtr makeRenderer(ContextPtr context) {
         setError(InvalidArgument);
         return RendererPtr();
     }
-    auto ptr = std::make_shared<RendererImpl>(std::move(context));
+    auto ptr = MAKE_SHARED_PTR<RendererImpl>(std::move(context));
     return ptr->init() ? ptr : RendererPtr();
 }
 

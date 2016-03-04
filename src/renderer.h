@@ -38,12 +38,14 @@ public:
     virtual ShapePtr makeShape() final;
     virtual TextPtr makeText() final;
 
-    virtual uint32_t draw(const Size& screen, const Color& clear) final;
+    virtual uint32_t draw(const Color& clear) final;
+    virtual void resize(const Size& size);
 
 private:
     ContextPtr context_;
     GeometryPtr rectGeometry_;
     ImagePtr stubImage_;
+    Size size_ {1, 1};
 
     using InstancePtr = std::unique_ptr<Instance>;
     using Batch = std::vector<InstancePtr>;
