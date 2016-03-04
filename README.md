@@ -21,3 +21,36 @@ See [draw-wxWidgets](https://github.com/vsergey3d/draw-wxWidgets) repo as exampl
 ## Licensing
 
 The library is licensed under the [Simplified BSD License](https://github.com/vsergey3d/draw/blob/master/LICENSE).
+
+## Example
+
+```cpp
+using namespace draw;
+
+class MyContext final : public Context {
+public:
+    /*...*/
+    virtual void setCurrent() final { mySetCurrent(); }
+};
+auto renderer = makeRenderer(std::move(make_unique<MyContext>(/*...*/)));
+
+auto image = renderer->makeImage({32, 32}, Image::Format::RGBA, true);
+image->upload({dataPtr, dataSize});
+
+auto rect = renderer->makeRect();
+rect->position({10, 20});
+rect->size({30, 30});
+rect->color({1.0f, 0.5f, 0.5f});
+rect->image(image);
+rect->visibility(true);
+
+auto text = renderer->makeText();
+text->position({10, 60});
+text->font(renderer->makeFont("cour.ttf", 10));
+text->text("ABCDEFG");
+text->visibility(true);
+
+renderer->resize(myScreenSize);
+renderer->draw({0.8f, 0.8f, 0.8f});
+mySwapBuffers();
+```
