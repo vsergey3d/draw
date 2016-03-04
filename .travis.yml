@@ -9,11 +9,15 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.8']
+          packages: ['g++-4.8', 'gcov-4.6']
       env: COMPILER=g++-4.8
     - os: linux
       compiler: clang
       env: COMPILER=clang++
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['gcov-4.6']
 
 before_install:
   - sudo apt-get update -qq -y
