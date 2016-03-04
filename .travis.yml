@@ -25,9 +25,9 @@ before_script:
   - cmake -DENABLE_COVERAGE=On -DCMAKE_CXX_COMPILER=$COMPILER ..
 
 script:
-  - make -j4
+  - make -j3
   - make test
-  - make gcov
+  - make draw_test-gcov
   - make lcov
 
 after_success:
