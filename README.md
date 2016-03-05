@@ -47,7 +47,7 @@ rect->visibility(true);
 auto text = renderer->makeText();
 text->position({10, 60});
 text->font(renderer->makeFont("cour.ttf", 10));
-text->text("ABCDEFG");
+text->text(L"ABCDEFG");
 text->visibility(true);
 
 renderer->resize(myScreenSize);
