@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef _DRAW_TEST
-#include "../test/glMock.h"
+#include "../test/gl_mock.h"
 #else
 #include <GL/glew.h>
 #endif

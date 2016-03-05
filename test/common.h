@@ -1,5 +1,5 @@
 #pragma once
-#include "glmock.h"
+#include "gl_mock.h"
 #include <draw.h>
 #include <gmock/gmock.h>
 #include <bandit/bandit.h>
