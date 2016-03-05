@@ -12,8 +12,6 @@ set(VERSION_MINOR   0   CACHE STRING "Project minor version number.")
 set(VERSION_PATCH   0   CACHE STRING "Project patch version number.")
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
-find_package(codecov)
-
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(LIB_DIR ${ROOT_DIR}/lib/${LIB_PATH})
 set(SRC_DIR ${ROOT_DIR}/src)
@@ -64,5 +62,3 @@ endif(DOXYGEN_FOUND)
 
 add_subdirectory(${SRC_DIR} ${CMAKE_BINARY_DIR}/${DRAW_LIB})
 add_subdirectory(${TEST_DIR} ${CMAKE_BINARY_DIR}/${DRAW_LIB}_test)
-
-coverage_evaluate()
