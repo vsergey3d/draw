@@ -1,6 +1,10 @@
-# draw&nbsp;&nbsp;[![Build Status](https://travis-ci.org/vsergey3d/draw.svg?branch=master)](https://travis-ci.org/vsergey3d/draw)
+# draw&nbsp;&nbsp;[![Build Status](https://travis-ci.org/vsergey3d/draw.svg?branch=master)](https://travis-ci.org/vsergey3d/draw)&nbsp;[![codecov.io](https://codecov.io/github/vsergey3d/draw/coverage.svg?branch=master)](https://codecov.io/github/vsergey3d/draw?branch=master)
 
-C++11 cross-platform GPU-accelerated pixel-space 2D drawing library
+C++11 cross-platform GPU-accelerated pixel-space 2D drawing library.
+
+[API documentation](http://vsergey3d.github.io/draw/) | 
+[Contributing](https://github.com/vsergey3d/draw/blob/master/CONTRIBUTING.md/) | 
+[FAQ](http://stackoverflow.com/questions/tagged/draw-cpp11-lib)
 
 ## Features
 

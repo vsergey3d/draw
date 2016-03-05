@@ -1,12 +1,4 @@
-#include <draw.h>
-
-#include <gmock/gmock.h>
-#include "glMock.h"
-#include <bandit/bandit.h>
-using namespace bandit;
-
-#define Given(obj, action) ON_CALL(obj, action)
-#define Verify(obj, action) EXPECT_CALL(obj, action)
+#include "common.h"
 
 go_bandit([](){
 
@@ -196,85 +188,6 @@ go_bandit([](){
             AssertThat(color1.b, Is().EqualToWithDelta(1.0f, 0.01f));
             AssertThat(color1.a, Is().EqualToWithDelta(0.23f, 0.01f));
         });
-    });
-
-    describe("renderer:", [](){
-
-        class ContextImpl : public draw::Context {
-        public:
-            ContextImpl() = default;
-            virtual ~ContextImpl() = default;
-            virtual void setCurrent() override {};
-        };
-
-        using ::testing::Return;
-        using ::testing::SetArgPointee;
-        using ::testing::_;
-
-        before_each([&]{
-
-            Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_OK));
-            Given(::glMocked(), glew_IsSupported(_)).WillByDefault(Return(true));
-            Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_NO_ERROR));
-            Given(::glMocked(), gl_CreateShader(_)).WillByDefault(Return(1));
-            Given(::glMocked(), gl_GetShaderiv(_, _, _)).WillByDefault(SetArgPointee<2>(GL_TRUE));
-            Given(::glMocked(), gl_CreateProgram()).WillByDefault(Return(1));
-            Given(::glMocked(), gl_GetProgramiv(_, _, _)).WillByDefault(SetArgPointee<2>(GL_TRUE));
-            Given(::glMocked(), gl_GetAttribLocation(_, _)).WillByDefault(Return(1));
-            Given(::glMocked(), gl_GetUniformLocation(_, _)).WillByDefault(Return(1));
-        });
-
-        it("should be created", [&]{
-
-            //Verify(::glMocked(), glew_Init()).Times(1);
-
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().Not().EqualTo(draw::RendererPtr()));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
-        });
-
-        it("should throw draw::InvalidArgument if context is invalid", [&]{
-
-            auto r = draw::makeRenderer(nullptr);
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::InvalidArgument));
-        });
-
-        it("throw draw::OpenGLAbsentFeature if OpenGL 2.0 is not supported", [&]{
-
-            Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_ERROR_NO_GL_VERSION));
-
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
-        });
-
-        it("throw draw::OpenGLAbsentFeature if ARB_draw_instanced is not supported", [&]{
-
-            Given(::glMocked(), glew_IsSupported(_)).WillByDefault(Return(false));
-
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
-        });
-
-        it("throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources", [&]{
-
-            Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_OUT_OF_MEMORY));
-
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLOutOfMemory));
-        });
-/*
-        it("should draw no objects", [&]{
-
-            draw::Size size;
-            draw::Color color;
-
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r->draw(size, color), Is().EqualTo(0));
-            AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
-        });*/
     });
 });
 

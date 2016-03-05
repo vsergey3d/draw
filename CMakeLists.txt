@@ -29,8 +29,8 @@ set(SOURCE_FILES ${SRC_DIR}/draw.cpp
         ${SRC_DIR}/shape.cpp
         ${SRC_DIR}/text.cpp)
 
-set(TEST_FILES
-        ${TEST_DIR}/drawTest.cpp)
+set(TEST_FILES ${TEST_DIR}/draw.cpp
+        ${TEST_DIR}/renderer.cpp)
 
 find_package(Doxygen REQUIRED)
 if(DOXYGEN_FOUND)

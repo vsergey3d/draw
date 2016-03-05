@@ -46,7 +46,9 @@ static ErrorCode gLastError = NoError;
 
 ErrorCode getLastError() {
 
-    return gLastError;
+    auto error = gLastError;
+    gLastError = NoError;
+    return error;
 }
 
 void setError(ErrorCode code) {

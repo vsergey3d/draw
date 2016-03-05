@@ -170,7 +170,7 @@ class Geometry {
 public:
     //! maximum available vertex count
     static const uint32_t kMaxVertexCount = 65535;//std::numeric_limits<Index>::max();
-    //! A 2D-vertex.
+    //! 2D-vertex.
     struct Vertex {
         //! 2D-position in [0.0, 1.0] space
         Vector2 position;
@@ -366,7 +366,7 @@ public:
 
 using TextPtr = SHARED_PTR<Text>;
 
-//! A factory and context owner.
+//! Factory and context owner.
 /*! To create an object of this type use draw::makeRenderer function. */
 #ifdef DRAW_NO_EXCEPTIONS
 /*!
