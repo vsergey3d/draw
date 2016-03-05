@@ -25,9 +25,13 @@ before_install:
   
 before_script:
   - uname -a
+  - printenv
   - export C="gcc-4.8"
   - export CXX="g++-4.8"
   - $COMPILER --version
+  - cmake --version
+  - which gcc-4.8 && gcc-4.8 --version
+  - which g++-4.8 && g++-4.8 --version
   - which gcov-4.8 && gcov-4.8 --version
   - lcov --version | grep lcov
   - mkdir build
