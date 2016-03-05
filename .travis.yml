@@ -36,7 +36,7 @@ before_script:
   - sudo ln -sf /usr/bin/gcc-4.8 /usr/bin/gcc && gcc --version
   - sudo ln -sf /usr/bin/g++-4.8 /usr/bin/g++ && g++ --version
   - sudo ln -sf /usr/bin/gcov-4.8 /usr/bin/gcov && gcov --version
-  - sudo ln -sf /usr/bin/lcov-1.11 /usr/bin/lcov && lcov --version
+#  - sudo ln -sf /usr/bin/lcov-1.11 /usr/bin/lcov && lcov --version
   - mkdir build
   - cd build
   - cmake -DENABLE_COVERAGE=On -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC ..
