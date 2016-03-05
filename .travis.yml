@@ -11,13 +11,13 @@ matrix:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['gcc-4.8', 'g++-4.8', 'gcov-4.8']
       env: COMPILER=g++-4.8
-    - os: linux
-      compiler: clang
-      env: COMPILER=clang++
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['gcc-4.8', 'gcov-4.8']
+#    - os: linux
+#      compiler: clang
+#      env: COMPILER=clang++
+#      addons:
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test']
+#          packages: ['gcc-4.8', 'gcov-4.8']
 
 before_install:
   - sudo apt-get update -qq -y
@@ -25,6 +25,8 @@ before_install:
   
 before_script:
   - uname -a
+  - export C="gcc-4.8"
+  - export CXX="g++-4.8"
   - $COMPILER --version
   - which gcov-4.8 && gcov-4.8 --version
   - lcov --version | grep lcov
