@@ -24,10 +24,10 @@ before_install:
   - sudo apt-get install -qq cmake doxygen lcov
   
 before_script:
+  - export CC="gcc-4.8"
+  - export CXX="g++-4.8"
   - uname -a
   - printenv
-  - export C="gcc-4.8"
-  - export CXX="g++-4.8"
   - $COMPILER --version
   - cmake --version
   - which gcc-4.8 && gcc-4.8 --version
