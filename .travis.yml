@@ -9,7 +9,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.8', 'gcov-4.6']
+          packages: ['gcc-4.8', 'g++-4.8', 'gcov-4.8']
       env: COMPILER=g++-4.8
     - os: linux
       compiler: clang
@@ -17,14 +17,17 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['gcov-4.6']
+          packages: ['gcc-4.8', 'gcov-4.8']
 
 before_install:
   - sudo apt-get update -qq -y
   - sudo apt-get install -qq cmake doxygen lcov
   
 before_script:
-  - gcov --version | grep gcov
+  - uname -a
+  - $COMPILER --version
+  - which gcov-4.8 && gcov-4.8 --version
+  - lcov --version | grep lcov
   - mkdir build
   - cd build
   - cmake -DENABLE_COVERAGE=On -DCMAKE_CXX_COMPILER=$COMPILER ..
