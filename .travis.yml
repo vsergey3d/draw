@@ -24,6 +24,7 @@ before_install:
   - sudo apt-get install -qq cmake doxygen lcov
   
 before_script:
+  - gcov --version | grep gcov
   - mkdir build
   - cd build
   - cmake -DENABLE_COVERAGE=On -DCMAKE_CXX_COMPILER=$COMPILER ..
