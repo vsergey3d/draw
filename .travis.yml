@@ -29,6 +29,27 @@ matrix:
         - CXX_COMPILER=clang++
         - C_COMPILER=clang
         - Codecove="Off"
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
+          packages: ['clang-3.5']
+      env:
+        - CXX_COMPILER=clang++-3.5
+        - C_COMPILER=clang-3.5
+        - Codecove="Off"
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['clang-3.6']
+      env:
+        - CXX_COMPILER=clang++-3.6
+        - C_COMPILER=clang-3.6
+        - Codecove="Off"
+
 
 before_install:
   - sudo apt-get update -qq -y
@@ -46,4 +67,4 @@ script:
   - cmake -DENABLE_COVERAGE=$Codecove -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER ..
   - make -j3
   - make test
-  - if [[ "$Codecove" == "On" ]];  then make draw_test-gcov; fi
+  - if [[ "$Codecove" == [oO]n ]];  then make draw_test-gcov; fi
