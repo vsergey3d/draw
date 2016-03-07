@@ -56,7 +56,7 @@ private:
 
     RendererImpl& renderer_;
     FontPtr font_;
-    uint32_t order_;
+    uint32_t order_ {0};
     std::wstring text_;
     std::vector<ShapePtr> shapes_;
     size_t shapeCount_ {0};
