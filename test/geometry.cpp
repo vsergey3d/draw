@@ -12,10 +12,10 @@ go_bandit([] {
             {{1.0f, 1.0f}, {1.0f, 1.0f}},
             {{0.0f, 1.0f}, {0.0f, 1.0f}}
         };
-        static const auto kVertexCount = sizeof(kVertices) / sizeof(Geometry::Vertex);
+        static const auto kVertexCount = sizeof(kVertices) / sizeof(kVertices[0]);
 
         static const Geometry::Index kIndices[] = {0, 1, 2, 2, 3, 0};
-        static const auto kIndexCount = sizeof(kIndices) / sizeof(Geometry::Index);
+        static const auto kIndexCount = sizeof(kIndices) / sizeof(kIndices[0]);
 
         static const auto kPrimitive = Geometry::Primitive::Triangle;
 

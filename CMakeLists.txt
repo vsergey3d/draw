@@ -31,7 +31,8 @@ set(SOURCE_FILES ${SRC_DIR}/draw.cpp
 
 set(TEST_FILES ${TEST_DIR}/draw.cpp
         ${TEST_DIR}/renderer.cpp
-        ${TEST_DIR}/geometry.cpp)
+        ${TEST_DIR}/geometry.cpp
+        ${TEST_DIR}/image.cpp)
 
 find_package(Doxygen REQUIRED)
 if(DOXYGEN_FOUND)
