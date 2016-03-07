@@ -1,8 +1,8 @@
 #include "common.h"
 
-go_bandit([](){
+go_bandit([]{
 
-    describe("draw::Renderer:", [](){
+    describe("draw::Renderer:", []{
 
         before_each([&]{
 
@@ -11,7 +11,7 @@ go_bandit([](){
 
         it("should be created", [&]{
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            auto r = makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
             AssertThat(r, Is().Not().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
         });
@@ -28,6 +28,7 @@ go_bandit([](){
             Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_ERROR_NO_GL_VERSION));
 
             auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
         });
 

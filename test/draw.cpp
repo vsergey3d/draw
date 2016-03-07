@@ -1,8 +1,8 @@
 #include "common.h"
 
-go_bandit([](){
+go_bandit([]{
 
-    describe("draw::Point", [](){
+    describe("draw::Point", []{
 
         draw::Point point;
         draw::Point point1 {2, 3};
@@ -50,7 +50,7 @@ go_bandit([](){
         });
     });
 
-    describe("draw::Size", [](){
+    describe("draw::Size", []{
 
         draw::Size size;
         draw::Size size1 {12, 88};
@@ -98,7 +98,7 @@ go_bandit([](){
         });
     });
 
-    describe("draw::Rect", [](){
+    describe("draw::Rect", []{
 
         draw::Rect rect;
         draw::Rect rect1 {9, -10, 33, 77};
@@ -150,7 +150,7 @@ go_bandit([](){
         });
     });
 
-    describe("draw::Vector2", [](){
+    describe("draw::Vector2", []{
 
         draw::Vector2 vector;
         draw::Vector2 vector1 {5.2, 6.3};
@@ -168,7 +168,7 @@ go_bandit([](){
         });
     });
 
-    describe("draw::Color", [](){
+    describe("draw::Color", []{
 
         draw::Color color;
         draw::Color color1 {0.5,0.77, 1.0, 0.23};
