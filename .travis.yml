@@ -37,13 +37,13 @@ before_install:
 before_script:
   - uname -a
   - printenv
-  - $COMPILER --version
+  - $CXX_COMPILER --version
   - cmake --version
+
+script:
   - mkdir build
   - cd build
   - cmake -DENABLE_COVERAGE=$Codecove -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER ..
-
-script:
   - make -j3
   - make test
   - if [[ "$Codecove" == "On" ]];  then make draw_test-gcov; fi
