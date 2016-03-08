@@ -30,8 +30,10 @@ public:
     virtual GeometryPtr geometry() const final { return geometry_; }
 
     virtual void image(const ImagePtr& image) final;
-    virtual void image(const ImagePtr& image, const Vector2& tile) final;
     virtual ImagePtr image() const final { return image_; }
+
+    virtual void image(const ImagePtr& image, const Vector2& tile) final;
+    virtual ImagePtr image(Vector2& tile) const final;
 
     virtual void image(const ImagePtr& atlas, const Rect& element) final;
     virtual ImagePtr image(Rect& element) const final;

@@ -265,7 +265,7 @@ public:
     virtual const Size& size() const = 0;
     //! set RGBA-color
     virtual void color(Color color) = 0;
-    //! return RGBA-color (initial value is {1.0, 1.0, 1.0, 1.0})
+    //! return RGBA-color (initial value is 0xFFFFFFFF)
     virtual Color color() const = 0;
     //! enable/disable transparency (alpha = image.a * color.a)
     virtual void transparency(bool value) = 0;
@@ -277,10 +277,12 @@ public:
     virtual GeometryPtr geometry() const = 0;
     //! set image
     virtual void image(const ImagePtr& image) = 0;
-    //! set image with tile factor (repetition count)
-    virtual void image(const ImagePtr& image, const Vector2& tile) = 0;
     //! return image (initial value is nullptr)
     virtual ImagePtr image() const = 0;
+    //! set image with tile factor (repetition count)
+    virtual void image(const ImagePtr& image, const Vector2& tile) = 0;
+    //! return image and tile factor (repetition count)
+    virtual ImagePtr image(Vector2& tile) const = 0;
     //! set a rectangular element of image atlas
     virtual void image(const ImagePtr& atlas, const Rect& element) = 0;
     //! return image atlas and rectangular part of it

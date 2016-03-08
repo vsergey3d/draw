@@ -166,6 +166,12 @@ void ShapeImpl::image(const ImagePtr& image, const Vector2& tile) {
     ShapeImpl::image(image, element_, tile);
 }
 
+ImagePtr ShapeImpl::image(Vector2& tile) const {
+
+    tile = tile_;
+    return image_;
+}
+
 ImagePtr ShapeImpl::image(Rect& element) const {
 
     element = element_;

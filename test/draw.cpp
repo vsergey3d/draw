@@ -159,36 +159,14 @@ go_bandit([]{
 
         it("should be zero by default", [&]{
 
-            AssertThat(vector.x, Is().EqualToWithDelta(0.0f, 0.01f));
-            AssertThat(vector.y, Is().EqualToWithDelta(0.0f, 0.01f));
+            AssertThat(vector.x, Is().EqualToWithDelta(0.0f, FLT_EPSILON));
+            AssertThat(vector.y, Is().EqualToWithDelta(0.0f, FLT_EPSILON));
         });
 
         it("should be constructed from params", [&]{
 
-            AssertThat(vector1.x, Is().EqualToWithDelta(5.2f, 0.01f));
-            AssertThat(vector1.y, Is().EqualToWithDelta(6.3f, 0.01f));
-        });
-    });
-
-    describe("draw::Color", []{
-
-        draw::Color color;
-        draw::Color color1 {0.5,0.77, 1.0, 0.23};
-
-        it("should be {0,0,0,1} by default", [&]{
-
-            AssertThat(color.r, Is().EqualToWithDelta(0.0f, 0.01f));
-            AssertThat(color.g, Is().EqualToWithDelta(0.0f, 0.01f));
-            AssertThat(color.b, Is().EqualToWithDelta(0.0f, 0.01f));
-            AssertThat(color.a, Is().EqualToWithDelta(1.0f, 0.01f));
-        });
-
-        it("should be constructed from params", [&]{
-
-            AssertThat(color1.r, Is().EqualToWithDelta(0.5f, 0.01f));
-            AssertThat(color1.g, Is().EqualToWithDelta(0.77f, 0.01f));
-            AssertThat(color1.b, Is().EqualToWithDelta(1.0f, 0.01f));
-            AssertThat(color1.a, Is().EqualToWithDelta(0.23f, 0.01f));
+            AssertThat(vector1.x, Is().EqualToWithDelta(5.2f, FLT_EPSILON));
+            AssertThat(vector1.y, Is().EqualToWithDelta(6.3f, FLT_EPSILON));
         });
     });
 });
