@@ -1,5 +1,7 @@
 #include "common.h"
 
+using namespace details;
+
 go_bandit([]{
 
     describe("draw::Renderer:", []{
@@ -11,15 +13,15 @@ go_bandit([]{
 
         it("should be created", [&]{
 
-            auto r = makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().Not().EqualTo(draw::RendererPtr()));
+            auto ptr = makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(ptr, Is().Not().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
         });
 
         it("should throw draw::InvalidArgument if context is invalid", [&]{
 
-            auto r = draw::makeRenderer(nullptr);
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            auto ptr = draw::makeRenderer(nullptr);
+            AssertThat(ptr, Is().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::InvalidArgument));
         });
 
@@ -27,8 +29,8 @@ go_bandit([]{
 
             Given(::glMocked(), glew_Init()).WillByDefault(Return(GLEW_ERROR_NO_GL_VERSION));
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(ptr, Is().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
         });
 
@@ -36,8 +38,8 @@ go_bandit([]{
 
             Given(::glMocked(), glew_IsSupported(_)).WillByDefault(Return(false));
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(ptr, Is().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLAbsentFeature));
         });
 
@@ -45,8 +47,8 @@ go_bandit([]{
 
             Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_OUT_OF_MEMORY));
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r, Is().EqualTo(draw::RendererPtr()));
+            auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(ptr, Is().EqualTo(draw::RendererPtr()));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::OpenGLOutOfMemory));
         });
 
@@ -54,8 +56,8 @@ go_bandit([]{
 
             draw::Size size;
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            r->resize(size);
+            auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            ptr->resize(size);
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
         });
 
@@ -63,8 +65,8 @@ go_bandit([]{
 
             draw::Color color;
 
-            auto r = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
-            AssertThat(r->draw(color), Is().EqualTo(0));
+            auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
+            AssertThat(ptr->draw(color), Is().EqualTo(0));
             AssertThat(draw::getLastError(), Is().EqualTo(draw::ErrorCode::NoError));
         });
     });

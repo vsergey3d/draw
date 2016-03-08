@@ -1,5 +1,7 @@
 #include "common.h"
 
+using namespace details;
+
 go_bandit([] {
 
     describe("draw::Image:", [] {
@@ -26,28 +28,28 @@ go_bandit([] {
 
         it("should be created", [&] {
 
-            auto i = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
+            auto ptr = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
             
-            AssertThat(i, Is().Not().EqualTo(ImagePtr()));
-            AssertThat(i->size(), Is().EqualTo(kImageSize));
-            AssertThat(i->format(), Is().EqualTo(kImageFormat));
-            AssertThat(i->filter(), Is().EqualTo(kImageFilter));
+            AssertThat(ptr, Is().Not().EqualTo(ImagePtr()));
+            AssertThat(ptr->size(), Is().EqualTo(kImageSize));
+            AssertThat(ptr->format(), Is().EqualTo(kImageFormat));
+            AssertThat(ptr->filter(), Is().EqualTo(kImageFilter));
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::NoError));
         });
         
         it("should throw InvalidArgument if size.width is zero or > Image::kMaxSize", [&] {
             
-            auto i = renderer->makeImage({Image::kMaxSize + 1, 1}, kImageFormat, kImageFilter);
+            auto ptr = renderer->makeImage({Image::kMaxSize + 1, 1}, kImageFormat, kImageFilter);
             
-            AssertThat(i, Is().EqualTo(ImagePtr()));
+            AssertThat(ptr, Is().EqualTo(ImagePtr()));
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::InvalidArgument));
         });
         
         it("should throw InvalidArgument if size.height is zero or > Image::kMaxSize", [&] {
 
-            auto i = renderer->makeImage({1, Image::kMaxSize + 1}, kImageFormat, kImageFilter);
+            auto ptr = renderer->makeImage({1, Image::kMaxSize + 1}, kImageFormat, kImageFilter);
 
-            AssertThat(i, Is().EqualTo(ImagePtr()));
+            AssertThat(ptr, Is().EqualTo(ImagePtr()));
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::InvalidArgument));
         });
         
@@ -55,32 +57,32 @@ go_bandit([] {
 
             Given(::glMocked(), gl_GetError()).WillByDefault(Return(GL_OUT_OF_MEMORY));
 
-            auto i = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
+            auto ptr = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
 
-            AssertThat(i, Is().EqualTo(ImagePtr()));
+            AssertThat(ptr, Is().EqualTo(ImagePtr()));
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::OpenGLOutOfMemory));
         });
 
         it("upload: should upload bytes to the image", [&] {
 
-            auto i = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
-            i->upload({kBytes, kByteSize});
+            auto ptr = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
+            ptr->upload({kBytes, kByteSize});
 
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::NoError));
         });
 
         it("upload: should throw InvalidArgument if bytes.data is invalid", [&] {
 
-            auto i = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
-            i->upload({nullptr, kByteSize});
+            auto ptr = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
+            ptr->upload({nullptr, kByteSize});
 
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::InvalidArgument));
         });
 
         it("upload: should throw InvalidArgument if bytes.count != width * height * (bpp)", [&] {
 
-            auto i = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
-            i->upload({kBytes, kByteSize + 1});
+            auto ptr = renderer->makeImage(kImageSize, kImageFormat, kImageFilter);
+            ptr->upload({kBytes, kByteSize + 1});
 
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::InvalidArgument));
         });

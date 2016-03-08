@@ -1,5 +1,7 @@
 #include "common.h"
 
+using namespace details;
+
 go_bandit([]{
 
     describe("draw::Point", []{

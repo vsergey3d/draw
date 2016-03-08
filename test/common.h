@@ -7,6 +7,9 @@
 #define Given(obj, action) ON_CALL(obj, action)
 #define Verify(obj, action) EXPECT_CALL(obj, action)
 
+namespace details {
+
+using namespace draw;
 using namespace bandit;
 
 using ::testing::Return;
@@ -33,3 +36,21 @@ inline void mockGL() {
     Given(::glMocked(), gl_GetAttribLocation(_, _)).WillByDefault(Return(1));
     Given(::glMocked(), gl_GetUniformLocation(_, _)).WillByDefault(Return(1));
 }
+
+static const auto kImageWidth = 2u, kImageHeight = 2u;
+static const Size kImageSize {kImageWidth, kImageHeight};
+static const auto kImageFormat = Image::Format::A;
+static const auto kImageFilter = true;
+static const uint8_t kImageData[kImageWidth * kImageHeight] = {0xAA, 0xAA, 0xAA, 0xAA};
+static const auto kImageDataSize = sizeof(kImageData) / sizeof(kImageData[0]);
+
+static const Geometry::Vertex kVertices[] = {
+    {{0.0f, 0.0f}, {0.0f, 0.0f}}, {{1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{1.0f, 1.0f}, {1.0f, 1.0f}}, {{0.0f, 1.0f}, {0.0f, 1.0f}}
+};
+static const auto kVertexCount = sizeof(kVertices) / sizeof(kVertices[0]);
+static const Geometry::Index kIndices[] = {0, 1, 2, 2, 3, 0};
+static const auto kIndexCount = sizeof(kIndices) / sizeof(kIndices[0]);
+static const auto kPrimitive = Geometry::Primitive::Triangle;
+
+} // namespace details
