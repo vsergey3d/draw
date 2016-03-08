@@ -25,8 +25,8 @@ public:
     virtual void text(const wchar_t* text) final;
     virtual const wchar_t* text() const final { return text_.c_str(); }
 
-    virtual void color(const Color& color) final;
-    virtual const Color& color() const final { return color_; }
+    virtual void color(Color color) final;
+    virtual Color color() const final { return color_; }
 
     virtual void horizAlign(HorizAlign alignment) final;
     virtual HorizAlign horizAlign() const final { return horizAlign_; }
@@ -64,7 +64,7 @@ private:
     Point alignOffset_ {0, 0};
     Size textSize_ {0, 0};
     Rect bounds_ {0, 0, 0, 0};
-    Color color_ {1.0f, 1.0f, 1.0f, 1.0f};
+    Color color_ {0xFFFFFFFF};
     HorizAlign horizAlign_ {HorizAlign::Left};
     VertAlign vertAlign_ {VertAlign::Top};
     bool visibility_ {false};

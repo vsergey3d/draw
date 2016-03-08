@@ -149,7 +149,7 @@ void TextImpl::text(const wchar_t* text) {
     }
 }
 
-void TextImpl::color(const Color& color) {
+void TextImpl::color(Color color) {
 
     color_ = color;
     for (size_t i = 0; i < shapeCount_; ++i)

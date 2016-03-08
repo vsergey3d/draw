@@ -357,16 +357,20 @@ inline GLuint glPrimitive(Geometry::Primitive primitive) {
     return 0;
 }
 
-inline void setupScreen(const Size& screen, const Color& clear) {
+inline void setupScreen(const Size& screen, Color clear) {
 
     glViewport(0, 0, screen.width, screen.height);
 
-    glClearColor(clear.r, clear.g, clear.b, clear.a);
+    glClearColor(
+        GLclampf(clear >> 24 & 0x000000FF),
+        GLclampf(clear >> 16 & 0x000000FF),
+        GLclampf(clear >> 8 & 0x000000FF),
+        GLclampf(clear & 0x000000FF));
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-uint32_t RendererImpl::draw(const Color& clear) {
+uint32_t RendererImpl::draw(Color clear) {
 
     setContext();
     setupScreen(size_, clear);

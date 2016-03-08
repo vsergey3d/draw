@@ -113,6 +113,9 @@ bool operator == (const Rect& left, const Rect& right);
 //! checks if two rects are not equal
 bool operator != (const Rect& left, const Rect& right);
 
+//! 32-bit RGBA color
+using Color = uint32_t;
+
 //! Floating-point 2D-vector.
 struct Vector2 {
 
@@ -124,25 +127,6 @@ struct Vector2 {
     //! construct from parameters
     Vector2(float x, float y) :
         x(x), y(y) {};
-};
-
-//! RGBA floating-point color
-struct Color {
-
-    //! red component
-    float r {0.0f};
-    //! green component
-    float g {0.0f};
-    //! blue component
-    float b {0.0f};
-    //! alpha component
-    float a {1.0f};
-
-    //! construct from zero values
-    Color() = default;
-    //! construct from parameters
-    Color(float r, float g, float b, float a = 1.0f) :
-        r(r), g(g), b(b), a(a) {};
 };
 
 //! Contiguous sequence of elements.
@@ -280,9 +264,9 @@ public:
     //! return size (initial value is {0, 0})
     virtual const Size& size() const = 0;
     //! set RGBA-color
-    virtual void color(const Color& color) = 0;
+    virtual void color(Color color) = 0;
     //! return RGBA-color (initial value is {1.0, 1.0, 1.0, 1.0})
-    virtual const Color& color() const = 0;
+    virtual Color color() const = 0;
     //! enable/disable transparency (alpha = image.a * color.a)
     virtual void transparency(bool value) = 0;
     //! check if transparency is enabled or not (initially disabled)
@@ -337,9 +321,9 @@ public:
     //! return text string (initial value is empty string)
     virtual const wchar_t* text() const = 0;
     //! set RGBA-color
-    virtual void color(const Color& color) = 0;
-    //! return RGBA-color (initial value is {1.0, 1.0, 1.0, 1.0})
-    virtual const Color& color() const = 0;
+    virtual void color(Color color) = 0;
+    //! return RGBA-color (initial value is 0xFFFFFFFF)
+    virtual Color color() const = 0;
     //! Horizontal alignment.
     enum class HorizAlign {
 
@@ -419,7 +403,7 @@ public:
     /*!
       \return drawn objects count
     */
-    virtual uint32_t draw(const Color& clear) = 0;
+    virtual uint32_t draw(Color clear) = 0;
     //! set a new screen size
     virtual void resize(const Size& size) = 0;
 };

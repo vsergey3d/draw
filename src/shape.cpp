@@ -21,12 +21,6 @@ inline void uvFrame(const ImagePtr& atlas, const Rect& rect,
     }
 }
 
-inline uint32_t packColor(const Color& color) {
-
-    return uint32_t(255 * color.r) | (uint32_t(255 * color.g) << 8) |
-        (uint32_t(255 * color.b) << 16) | (uint32_t(255 * color.a) << 24);
-}
-
 ShapeImpl::ShapeImpl(RendererImpl& renderer, FillMode fillMode) :
     renderer_(renderer),
     fillMode_(fillMode) {
@@ -48,7 +42,7 @@ void ShapeImpl::addInstance() {
     posFrame.w = (float)size_.height;
 
     uvFrame(image_, element_, tile_, instance_->uvFrame);
-    instance_->color = packColor(color_);
+    instance_->color = color_;
 }
 
 void ShapeImpl::removeInstance() {
@@ -109,11 +103,11 @@ void ShapeImpl::size(const Size& size) {
     }
 }
 
-void ShapeImpl::color(const Color& color) {
+void ShapeImpl::color(Color color) {
 
     color_ = color;
     if (visibility_)
-        instance_->color = packColor(color_);
+        instance_->color = color_;
 }
 
 void ShapeImpl::transparency(bool value) {

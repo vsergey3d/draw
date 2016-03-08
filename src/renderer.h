@@ -38,7 +38,7 @@ public:
     virtual ShapePtr makeShape() final;
     virtual TextPtr makeText() final;
 
-    virtual uint32_t draw(const Color& clear) final;
+    virtual uint32_t draw(Color clear) final;
     virtual void resize(const Size& size);
 
 private:

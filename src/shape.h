@@ -20,8 +20,8 @@ public:
     virtual void size(const Size& size) final;
     virtual const Size& size() const final { return size_; }
 
-    virtual void color(const Color& color) final;
-    virtual const Color& color() const final { return color_; }
+    virtual void color(Color color) final;
+    virtual Color color() const final { return color_; }
 
     virtual void transparency(bool value) final;
     virtual bool transparency() const final { return fillMode_ == FillMode::Transparent; }
@@ -64,7 +64,7 @@ private:
     Point position_ {0, 0};
     Size size_ {0, 0};
     Rect bounds_ {0, 0, 0, 0};
-    Color color_ {1.0f, 1.0f, 1.0f, 1.0f};
+    Color color_ {0xFFFFFFFF};
     Rect element_ {0, 0, 1, 1};
     Vector2 tile_ {1.0f, 1.0f};
     bool visibility_ {false};
