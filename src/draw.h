@@ -251,19 +251,19 @@ class Visual {
 
 public:
     virtual ~Visual() = default;
-    //! enable/disable visibility
+    //! enable/disable visibility (initially disabled)
     virtual void visibility(bool enable) = 0;
     //! check if visibility is enabled or not
     virtual bool visibility() const = 0;
     //! set order of drawing (first 0, then 1, ...)
     virtual void order(uint32_t order) = 0;
-    //! return order of drawing
+    //! return order of drawing (initial value is 0)
     virtual uint32_t order() const = 0;
     //! set position
     virtual void position(const Point& position) = 0;
-    //! return position
+    //! return position (initial value is {0, 0})
     virtual const Point& position() const = 0;
-    //! return bounding rect
+    //! return bounding rect (initial value is {0, 0, 0, 0})
     virtual const Rect& bounds() const = 0;
 };
 
@@ -277,25 +277,25 @@ public:
     virtual ~Shape() = default;
     //! set size
     virtual void size(const Size& size) = 0;
-    //! return size
+    //! return size (initial value is {0, 0})
     virtual const Size& size() const = 0;
     //! set RGBA-color
     virtual void color(const Color& color) = 0;
-    //! return RGBA-color
+    //! return RGBA-color (initial value is {1.0, 1.0, 1.0, 1.0})
     virtual const Color& color() const = 0;
     //! enable/disable transparency (alpha = image.a * color.a)
     virtual void transparency(bool value) = 0;
-    //! check if transparency is enabled or not
+    //! check if transparency is enabled or not (initially disabled)
     virtual bool transparency() const = 0;
     //! set geometry
     virtual void geometry(const GeometryPtr& geometry) = 0;
-    //! return geometry
+    //! return geometry (initial value is nullptr)
     virtual GeometryPtr geometry() const = 0;
     //! set image
     virtual void image(const ImagePtr& image) = 0;
     //! set image with tile factor (repetition count)
     virtual void image(const ImagePtr& image, const Vector2& tile) = 0;
-    //! return image
+    //! return image (initial value is nullptr)
     virtual ImagePtr image() const = 0;
     //! set a rectangular element of image atlas
     virtual void image(const ImagePtr& atlas, const Rect& element) = 0;
@@ -330,15 +330,15 @@ public:
     virtual ~Text() = default;
     //! set Font object
     virtual void font(const FontPtr& font) = 0;
-    //! return Font object
+    //! return Font object (initial value is nullptr)
     virtual FontPtr font() const = 0;
     //! set text string
     virtual void text(const wchar_t* text) = 0;
-    //! return text string
+    //! return text string (initial value is empty string)
     virtual const wchar_t* text() const = 0;
-    //! set color
+    //! set RGBA-color
     virtual void color(const Color& color) = 0;
-    //! return color
+    //! return RGBA-color (initial value is {1.0, 1.0, 1.0, 1.0})
     virtual const Color& color() const = 0;
     //! Horizontal alignment.
     enum class HorizAlign {
@@ -349,7 +349,7 @@ public:
     };
     //! set horizontal alignment
     virtual void horizAlign(HorizAlign alignment) = 0;
-    //! return horizontal alignment
+    //! return horizontal alignment (initial value is HorizAlign::Left)
     virtual HorizAlign horizAlign() const = 0;
     //! Vertical alignment.
     enum class VertAlign {
@@ -360,7 +360,7 @@ public:
     };
     //! set vertical alignment
     virtual void vertAlign(VertAlign alignment) = 0;
-    //! return vertical alignment
+    //! return vertical alignment (initial value is VertAlign::Top)
     virtual VertAlign vertAlign() const = 0;
 };
 
