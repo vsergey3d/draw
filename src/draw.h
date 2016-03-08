@@ -410,19 +410,10 @@ public:
     */
     virtual FontPtr makeFont(const char* filePath, uint32_t letterSize) = 0;
     //! make Shape object with rectangle Geometry
-    /*!
-      \throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources
-    */
     virtual ShapePtr makeRect() = 0;
     //! make Shape object
-    /*!
-      \throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources
-    */
     virtual ShapePtr makeShape() = 0;
     //! make Text object
-    /*!
-      \throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources
-    */
     virtual TextPtr makeText() = 0;
     //! clear the screen and repaint all visible objects
     /*!
