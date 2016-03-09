@@ -63,7 +63,7 @@ go_bandit([]{
 
         it("should draw no objects", [&]{
 
-            draw::Color color;
+            draw::Color color = 0x00000000;
 
             auto ptr = draw::makeRenderer(std::unique_ptr<ContextImpl>(new ContextImpl()));
             AssertThat(ptr->draw(color), Is().EqualTo(0));
