@@ -19,4 +19,4 @@ build_script:
   - mkdir build
   - cd build
   - cmake -DENABLE_COVERAGE=Off .. 
-  - cmake --build . --config %configuration% --target draw
+  - cmake --build . --config %configuration%
