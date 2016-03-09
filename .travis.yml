@@ -77,6 +77,9 @@ matrix:
         - CXX_COMPILER=clang++
         - C_COMPILER=clang
         - Codecove="Off"
+      addons:
+        apt:
+          packages: ['cmake']
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update -qq -y; fi
