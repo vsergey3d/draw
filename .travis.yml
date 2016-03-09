@@ -9,25 +9,6 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['gcc-4.8', 'g++-4.8', 'gcov-4.8']
-      env:
-        - CXX_COMPILER=g++-4.8
-        - C_COMPILER=gcc-4.8
-        - Codecove="On"
-      before_script:
-        - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
-        - tar xf lcov_1.11.orig.tar.gz
-        - sudo make -C lcov-1.11/ install
-        - sudo ln -sf /usr/bin/gcc-4.8 /usr/bin/gcc && gcc --version
-        - sudo ln -sf /usr/bin/g++-4.8 /usr/bin/g++ && g++ --version
-        - sudo ln -sf /usr/bin/gcov-4.8 /usr/bin/gcov && gcov --version
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -X gcov
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
           packages: ['gcc-4.9', 'g++-4.9']
       env:
         - CXX_COMPILER=g++-4.9
@@ -38,11 +19,20 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5']
+          packages: ['gcc-5', 'g++-5', 'gcov-5']
       env:
         - CXX_COMPILER=g++-5
         - C_COMPILER=gcc-5
-        - Codecove="Off"
+        - Codecove="On"
+      before_script:
+        - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
+        - tar xf lcov_1.11.orig.tar.gz
+        - sudo make -C lcov-1.11/ install
+        - sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc && gcc --version
+        - sudo ln -sf /usr/bin/g++-5 /usr/bin/g++ && g++ --version
+        - sudo ln -sf /usr/bin/gcov-5 /usr/bin/gcov && gcov --version
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -X gcov
     - os: linux
       compiler: clang
       addons:
@@ -64,14 +54,14 @@ matrix:
         - C_COMPILER=clang-3.7
         - Codecove="Off"
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7
       compiler: clang
       env:
         - CXX_COMPILER=clang++
         - C_COMPILER=clang
         - Codecove="Off"
     - os: osx
-      osx_image: xcode7
+      osx_image: xcode7.3
       compiler: clang
       env:
         - CXX_COMPILER=clang++
