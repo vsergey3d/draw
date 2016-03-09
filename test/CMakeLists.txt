@@ -21,7 +21,7 @@ add_subdirectory(${DEPS_DIR}/freetype2 ${CMAKE_BINARY_DIR}/freetype2 EXCLUDE_FRO
 
 add_definitions(-D_UNICODE)
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX  /wd4244 /wd4512 /wd4100 /wd4702")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4244 /wd4512 /wd4100 /wd4702")
 elseif(UNIX OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor -Werror")
 endif()
