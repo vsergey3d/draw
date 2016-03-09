@@ -1,4 +1,4 @@
-# draw&nbsp;&nbsp;[![Build Status](https://travis-ci.org/vsergey3d/draw.svg?branch=master)](https://travis-ci.org/vsergey3d/draw)&nbsp;[![codecov.io](https://codecov.io/github/vsergey3d/draw/coverage.svg?branch=master)](https://codecov.io/github/vsergey3d/draw?branch=master)
+# draw&nbsp;&nbsp;[![Build Status](https://travis-ci.org/vsergey3d/draw.svg?branch=master)](https://travis-ci.org/vsergey3d/draw)&nbsp;[![Build status](https://ci.appveyor.com/api/projects/status/c2pddl9cch6gkfwa?svg=true)](https://ci.appveyor.com/project/vsergey3d/draw)&nbsp;[![codecov.io](https://codecov.io/github/vsergey3d/draw/coverage.svg?branch=master)](https://codecov.io/github/vsergey3d/draw?branch=master)
 
 C++11 cross-platform GPU-accelerated pixel-space 2D drawing library.
 
