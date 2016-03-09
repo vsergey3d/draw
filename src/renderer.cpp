@@ -362,10 +362,10 @@ inline void setupScreen(const Size& screen, Color clear) {
     glViewport(0, 0, screen.width, screen.height);
 
     glClearColor(
-        GLclampf(clear >> 24 & 0x000000FF),
-        GLclampf(clear >> 16 & 0x000000FF),
-        GLclampf(clear >> 8 & 0x000000FF),
-        GLclampf(clear & 0x000000FF));
+        GLclampf(clear >> 24 & 0x000000FF) / 255,
+        GLclampf(clear >> 16 & 0x000000FF) / 255,
+        GLclampf(clear >> 8 & 0x000000FF) / 255,
+        GLclampf(clear & 0x000000FF) / 255);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
