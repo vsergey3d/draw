@@ -11,8 +11,7 @@ configuration:
 install:
   - ps: cmake --version
   - ps: msbuild /version
-  - ps: (New-Object net.webclient).DownloadFile('http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.8.windows.bin.zip', "$pwd\doxygen-1.8.8.windows.bin.zip")
-  - ps: 7z X doxygen-1.8.8.windows.bin.zip -Odoxygen
+  - choco install doxygen.portable
 
 build_script:
   - mkdir build
