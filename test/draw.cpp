@@ -155,7 +155,7 @@ go_bandit([]{
     describe("draw::Vector2", []{
 
         draw::Vector2 vector;
-        draw::Vector2 vector1 {5.2, 6.3};
+        draw::Vector2 vector1 {5.2f, 6.3f};
 
         it("should be zero by default", [&]{
 
