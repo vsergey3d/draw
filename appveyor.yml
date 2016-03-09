@@ -1,4 +1,3 @@
-version: "{build}"
 
 os:
   - Visual Studio 2015
@@ -10,11 +9,6 @@ branches:
 configuration:
   - Debug
   - Release
-
-environment:
-  matrix:
-    - TOOLCHAIN_VERSION: 14.0
-    - TOOLCHAIN_VERSION: 12.0
     
 install:
   - ps: cmake --version
