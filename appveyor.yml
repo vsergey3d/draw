@@ -2,8 +2,9 @@ version: 0.0.0-{build}
 
 environment:
   matrix:
-  - cmake_generator: Visual Studio 14 2015
-  - cmake_generator: Visual Studio 12 2013
+  - Generator: Visual Studio 14 2015
+  - Generator: Visual Studio 12 2013
+  - Generator: MinGW Makefiles
   
 branches:
   only:
@@ -24,5 +25,5 @@ install:
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "%cmake_generator%" -DENABLE_COVERAGE=Off .. 
+  - cmake -G "%Generator%" -DCMAKE_BUILD_TYPE=%configuration% -DENABLE_COVERAGE=Off .. 
   - cmake --build . --config %configuration%
