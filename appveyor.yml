@@ -2,8 +2,8 @@ version: 0.0.0-{build}
 
 environment:
   matrix:
-  - cmake_generator: Visual Studio 14
-  - cmake_generator: Visual Studio 12
+  - cmake_generator: Visual Studio 14 2015
+  - cmake_generator: Visual Studio 12 2013
   
 branches:
   only:
