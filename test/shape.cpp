@@ -24,8 +24,8 @@ go_bandit([] {
             AssertThat(ptr->size(), Is().EqualTo(Size(0, 0)));
             AssertThat(ptr->color(), Is().EqualTo(0xFFFFFFFF));
             AssertThat(ptr->transparency(), Is().EqualTo(false));
-            AssertThat(ptr->geometry(), Is().EqualTo(nullptr));
-            AssertThat(ptr->image(), Is().EqualTo(nullptr));
+            AssertThat(ptr->geometry(), Is().EqualTo(GeometryPtr()));
+            AssertThat(ptr->image(), Is().EqualTo(ImagePtr()));
 
             AssertThat(ptr, Is().Not().EqualTo(ShapePtr()));
             AssertThat(getLastError(), Is().EqualTo(ErrorCode::NoError));
