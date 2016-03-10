@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(${DRAW_LIB} CXX)
 
 add_definitions(-D_UNICODE -DGLEW_STATIC -D_CRT_SECURE_NO_WARNINGS)
+#Workaround for MinGW bug in math.h
+if(MINGW)
+    add_definitions(-D__NO_INLINE__)
+endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX  /wd4244 /wd4512 /wd4100 /wd4702")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
