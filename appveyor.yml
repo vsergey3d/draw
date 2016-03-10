@@ -23,6 +23,8 @@ install:
   - choco install doxygen.portable
 
 build_script:
+  - set PATH=%PATH:C:\Program Files (x86)\Git\bin;=%
+  - set PATH=C:\MinGW\bin;%PATH%
   - mkdir build
   - cd build
   - cmake -G "%Generator%" -DCMAKE_BUILD_TYPE=%configuration% -DENABLE_COVERAGE=Off .. 
