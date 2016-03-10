@@ -1,6 +1,9 @@
+version: 0.0.0-{build}
 
-os:
-  - Visual Studio 2015
+environment:
+  matrix:
+  - cmake_generator: Visual Studio 14
+  - cmake_generator: Visual Studio 12
   
 branches:
   only:
@@ -21,5 +24,5 @@ install:
 build_script:
   - mkdir build
   - cd build
-  - cmake -DENABLE_COVERAGE=Off .. 
+  - cmake -G %cmake_generator% -DENABLE_COVERAGE=Off .. 
   - cmake --build . --config %configuration%
