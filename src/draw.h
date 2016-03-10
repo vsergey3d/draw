@@ -392,7 +392,6 @@ public:
       \throw draw::InvalidArgument if letterSize is less than Font::kMinLetterSize
       \throw draw::InvalidFontFile if font file is not exist or corrupted
       \throw draw::IncompleteFontFile if some alphabet's glyphs is not contained in the font file
-      \throw draw::OpenGLOutOfMemory if is not enough memory to create internal OpenGL resources
     */
     virtual FontPtr makeFont(const char* filePath, uint32_t letterSize) = 0;
     //! make Shape object with rectangle Geometry
