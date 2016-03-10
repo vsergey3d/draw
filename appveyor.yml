@@ -10,6 +10,9 @@ configuration:
   - Debug
   - Release
     
+platform:
+  - x86
+
 install:
   - ps: cmake --version
   - ps: msbuild /version
