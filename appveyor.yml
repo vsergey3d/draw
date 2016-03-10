@@ -23,7 +23,7 @@ install:
   - choco install doxygen.portable
 
 build_script:
-  - set PATH=%PATH:C:\Program Files (x86)\Git\bin;=%
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
   - set PATH=C:\MinGW\bin;%PATH%
   - mkdir build
   - cd build
