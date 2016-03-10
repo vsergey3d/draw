@@ -33,6 +33,7 @@ set(TEST_FILES ${TEST_DIR}/draw.cpp
         ${TEST_DIR}/renderer.cpp
         ${TEST_DIR}/geometry.cpp
         ${TEST_DIR}/image.cpp
+        ${TEST_DIR}/font.cpp
         ${TEST_DIR}/shape.cpp)
 
 find_package(Doxygen REQUIRED)
