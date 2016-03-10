@@ -44,7 +44,7 @@ image->upload({dataPtr, dataSize});
 auto rect = renderer->makeRect();
 rect->position({10, 20});
 rect->size({30, 30});
-rect->color({1.0f, 0.5f, 0.5f});
+rect->color(0xCC0000FF);
 rect->image(image);
 rect->visibility(true);
 
@@ -55,6 +55,6 @@ text->text(L"ABCDEFG");
 text->visibility(true);
 
 renderer->resize(myScreenSize);
-renderer->draw({0.8f, 0.8f, 0.8f});
+renderer->draw(0xEEEEEEFF);
 mySwapBuffers();
 ```
