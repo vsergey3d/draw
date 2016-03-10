@@ -20,6 +20,10 @@ add_subdirectory(${DEPS_DIR}/agg ${CMAKE_BINARY_DIR}/agg EXCLUDE_FROM_ALL)
 add_subdirectory(${DEPS_DIR}/freetype2 ${CMAKE_BINARY_DIR}/freetype2 EXCLUDE_FROM_ALL)
 
 add_definitions(-D_UNICODE)
+#Workaround for MinGW bug in math.h
+if(MINGW)
+    add_definitions(-D__NO_INLINE__)
+endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4244 /wd4512 /wd4100 /wd4702")
 elseif(UNIX OR CMAKE_COMPILER_IS_GNUCXX)
