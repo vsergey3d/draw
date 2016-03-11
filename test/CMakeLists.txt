@@ -30,6 +30,11 @@ elseif(UNIX OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor -Werror")
 endif()
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cour.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+string(COMPARE NOTEQUAL "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "" outdirChanged)
+if(${outdirChanged})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cour.ttf DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
 add_gmock_test(${PROJECT} ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(${PROJECT} ${LIBS})
 
