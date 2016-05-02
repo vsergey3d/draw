@@ -39,7 +39,7 @@ public:
 auto renderer = makeRenderer(std::move(make_unique<MyContext>(/*...*/)));
 
 auto image = renderer->makeImage({32, 32}, Image::Format::RGBA, true);
-image->upload({dataPtr, dataSize});
+image->upload(dataSpan);
 
 auto rect = renderer->makeRect();
 rect->position({10, 20});
